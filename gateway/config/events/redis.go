@@ -8,7 +8,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-var client *redis.Client
+var client *redis.Client // Variável global
 
 var (
 	redisHost = os.Getenv("REDIS_HOST")
@@ -18,49 +18,43 @@ var (
 var ctx = context.Background()
 
 func init() {
-	redisHost := os.Getenv("REDIS_HOST")
+	// Verifique as variáveis de ambiente para conectar ao Redis
 	if redisHost == "" {
 		panic("Error getting REDIS_HOST")
 	}
 
-	redisPort := os.Getenv("REDIS_PORT")
 	if redisPort == "" {
 		panic("Error getting REDIS_PORT")
 	}
-
-	redisPassword := os.Getenv("REDIS_PASSWORD")
-	if redisPassword == "" {
-		panic("Error getting REDIS_PASSWORD")
-	}
-
 }
 
-// NewProducer cria um novo produtor Kafka
+// StartClient cria e inicializa o cliente Redis
 func StartClient() error {
-
 	redisAddr := fmt.Sprintf("%s:%s", redisHost, redisPort)
 
-	client := redis.NewClient(&redis.Options{
+	// Inicialize o cliente Redis globalmente
+	client = redis.NewClient(&redis.Options{
 		Addr: redisAddr,
 	})
 
-	defer client.Close()
-
+	// Testa a conexão com o Redis
 	_, err := client.Ping(ctx).Result()
-
 	if err != nil {
 		return fmt.Errorf("error connecting to Redis: %w", err)
 	}
 
+	// Após a conexão, chama SubscribeChannels para se inscrever
 	SubscribeChannels()
 
 	return nil
 }
 
 func SubscribeChannels() {
+	// Assine o canal de eventos do usuário
 	SubscribeUserChannel()
 }
 
+// Função para acessar o cliente Redis globalmente
 func GetRedisClient() *redis.Client {
 	return client
 }

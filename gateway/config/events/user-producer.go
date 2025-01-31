@@ -13,7 +13,12 @@ const (
 )
 
 func SubscribeUserChannel() {
-	// Subscribe to the user channel
+	// Certifique-se de que o cliente não é nil antes de tentar se inscrever
+	if client == nil {
+		panic("Redis client is not initialized")
+	}
+
+	// Use o cliente global para assinar o canal
 	client.Subscribe(ctx, "user_events")
 }
 
@@ -23,7 +28,7 @@ func NewUserProducer(client *redis.Client) *UserProducer {
 
 func (u *UserProducer) PublishUserEvent(event UserEvents) error {
 	// Publish the event to the user channel
-	err := u.Producer.Publish(ctx, "user_events", event).Err()
+	err := u.Producer.Publish(ctx, "user_events", string(event)).Err()
 	if err != nil {
 		return err
 	}

@@ -7,5 +7,5 @@ type Bucket struct {
 type BucketName string
 
 const (
-	AuthBucket BucketName = "auth"
+	AuthBucket BucketName = "gateway-bucket-app"
 )

@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  # Serviço para o banco de dados PostgreSQL
+  db:
+    image: postgres:13
+    container_name: postgres-db
+    env_file:
+      - .env  # Carrega o arquivo .env com as variáveis de ambiente
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "6379:6379"
+    environment:
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+
+  # Serviço para o servidor Gin (Go)
+  app:
+    build: .
+    container_name: go-server
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - .env  # Carrega o arquivo .env para dentro do contêiner
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    command: ["go", "run", "cmd/gateway/main.go"]
+
+volumes:
+  postgres-data:

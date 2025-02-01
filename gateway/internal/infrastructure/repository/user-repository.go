@@ -56,7 +56,7 @@ func (r *UserRepository) CreateClient(clientData *user.Client) error {
 		return fmt.Errorf("error saving client: %v", err)
 	}
 
-	if err := transaction.Create(schemas.UserAuth{
+	if err := transaction.Create(&schemas.UserAuth{
 		UserID:        clientData.ID,
 		URLPrivateKey: fmt.Sprintf("private_key_%s_%s.pem", clientData.Name, clientData.Document),
 		URLPublicKey:  fmt.Sprintf("public_key_%s_%s.pem", clientData.Name, clientData.Document),

@@ -19,7 +19,8 @@ func SubscribeUserChannel() {
 	}
 
 	// Use o cliente global para assinar o canal
-	client.Subscribe(ctx, "user_events")
+
+	client.Subscribe(ctx, "user_created")
 }
 
 func NewUserProducer(client *redis.Client) *UserProducer {
@@ -28,7 +29,7 @@ func NewUserProducer(client *redis.Client) *UserProducer {
 
 func (u *UserProducer) PublishUserEvent(event UserEvents) error {
 	// Publish the event to the user channel
-	err := u.Producer.Publish(ctx, "user_events", string(event)).Err()
+	err := u.Producer.Publish(ctx, "user_created", string(event)).Err()
 	if err != nil {
 		return err
 	}

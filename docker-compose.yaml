@@ -1,0 +1,60 @@
+version: "3.8"
+
+services:
+  # Serviço para o banco de dados PostgreSQL para o projeto Gateway (Go)
+  gateway-db:
+    image: postgres:13
+    container_name: gateway-postgres-db
+    env_file:
+      - gateway/.env  # Carrega o arquivo .env para dentro do contêiner
+    volumes:
+      - gateway-postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${GATEWAY_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${GATEWAY_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${GATEWAY_DB_NAME}
+    ports:
+      - "5432:5432"
+
+  # Serviço Redis compartilhado entre Gateway e Inventory
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "6379:6379"
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+  # Serviço para o servidor Gateway (Go)
+  gateway-app:
+    build: ./gateway  # Caminho para o diretório do Gateway (Go)
+    container_name: gateway-server
+    depends_on:
+      - gateway-db
+      - redis
+    env_file:
+      - ./gateway/.env   # Carrega o arquivo .env para dentro do contêiner
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./gateway:/app
+    command: ["go", "run", "cmd/gateway/main.go"]
+
+  # Serviço para o servidor Inventory (NestJS)
+  inventory-app:
+    build: ./inventory-management  # Caminho para o diretório do Inventory (NestJS)
+    container_name: inventory-server
+    depends_on:
+      - redis
+    env_file:
+      - ./inventory-management/.env  # Carrega o arquivo .env para dentro do contêiner
+    ports:
+      - "3000:3000"  # A porta exposta do Inventory
+    volumes:
+      - ./inventory-management:/app
+    command: ["npm", "run", "start"]
+
+volumes:
+  gateway-postgres-data:
+  inventory-postgres-data:

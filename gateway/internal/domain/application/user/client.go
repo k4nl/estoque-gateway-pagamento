@@ -1,9 +1,7 @@
 package user
 
 import (
-	"gateway/package/document"
-	"gateway/package/name"
-	"gateway/package/password"
+	value_object "gateway/package/value-object"
 	"time"
 
 	"github.com/google/uuid"
@@ -24,15 +22,15 @@ const (
 
 func NewClient(userName string, userDocument string, userPassword string) (*Client, error) {
 
-	if _, err := name.ValidadeName(userName); err != nil {
+	if _, err := value_object.ValidadeName(userName); err != nil {
 		return nil, err
 	}
 
-	if _, err := document.ValidadeDocument(userDocument); err != nil {
+	if _, err := value_object.ValidadeDocument(userDocument); err != nil {
 		return nil, err
 	}
 
-	pwd, err := password.NewPassword(userPassword)
+	pwd, err := value_object.NewPassword(userPassword)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +39,7 @@ func NewClient(userName string, userDocument string, userPassword string) (*Clie
 		User: User{
 			ID:        uuid.New(),
 			Name:      userName,
-			Document:  document.CleanDocument(userDocument),
+			Document:  value_object.CleanDocument(userDocument),
 			Role:      ClientRole,
 			IsBlocked: false,
 			Password:  pwd.String(),

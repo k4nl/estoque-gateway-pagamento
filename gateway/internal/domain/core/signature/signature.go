@@ -6,13 +6,13 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"errors"
-	"gateway/internal/domain/auth"
-	"gateway/internal/domain/user"
+	"gateway/internal/domain/application/user"
+	"gateway/internal/domain/core/auth"
 )
 
 type Signature struct {
 	Signature string `json:"signature"`
-	payload	 string
+	payload   string
 }
 
 func ValidateRequest(signature Signature, user *user.User) error {
@@ -30,7 +30,7 @@ func ValidateRequest(signature Signature, user *user.User) error {
 	decodedSignature, err := base64.StdEncoding.DecodeString(signature.Signature)
 
 	if err != nil {
-		return errors.New("Invalid signature")
+		return errors.New("invalid signature")
 	}
 
 	hashedPayload := sha256.Sum256([]byte(signature.payload))
@@ -43,5 +43,5 @@ func ValidateRequest(signature Signature, user *user.User) error {
 
 	// Se a assinatura for válida, retorna nil
 	return nil
-	
+
 }

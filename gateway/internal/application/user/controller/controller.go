@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	userdto "gateway/internal/application/user/dto"
 	userService "gateway/internal/application/user/service"
-	"gateway/package/document"
+	value_object "gateway/package/value-object"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -44,7 +44,7 @@ func (uc UserController) FindUser(c *gin.Context) {
 
 	param_document := c.Param("document")
 
-	validated_document, err := document.ValidadeDocument(param_document)
+	validated_document, err := value_object.ValidadeDocument(param_document)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"Message": err.Error()})

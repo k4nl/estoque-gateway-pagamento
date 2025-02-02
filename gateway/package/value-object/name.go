@@ -1,4 +1,4 @@
-package name
+package value_object
 
 import (
 	"errors"

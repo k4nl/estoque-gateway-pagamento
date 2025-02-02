@@ -3,7 +3,7 @@ package token
 import (
 	"errors"
 	"fmt"
-	"gateway/internal/domain/user"
+	"gateway/internal/domain/application/user"
 	"os"
 	"time"
 
@@ -14,7 +14,7 @@ import (
 type Token struct {
 	UserID    string `json:"user_id"`
 	IsBlocked bool   `json:"is_blocked"`
-	ExpiresAt int64	`json:"expires_at"`
+	ExpiresAt int64  `json:"expires_at"`
 	CreatedAt string `json:"created_at"`
 }
 

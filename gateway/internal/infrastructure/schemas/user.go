@@ -1,7 +1,7 @@
 package schemas
 
 import (
-	"gateway/internal/domain/user"
+	"gateway/internal/domain/application/user"
 	"time"
 
 	"github.com/google/uuid"

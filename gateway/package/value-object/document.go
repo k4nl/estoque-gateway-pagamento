@@ -1,4 +1,4 @@
-package document
+package value_object
 
 import (
 	"errors"

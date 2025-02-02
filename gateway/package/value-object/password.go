@@ -1,4 +1,4 @@
-package password
+package value_object
 
 import (
 	"errors"

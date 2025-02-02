@@ -7,7 +7,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"gateway/internal/domain/user"
+	"gateway/internal/domain/application/user"
 	awsutils "gateway/package/aws-utils"
 )
 

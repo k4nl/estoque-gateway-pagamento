@@ -2,7 +2,7 @@ package repository
 
 import (
 	"fmt"
-	"gateway/internal/domain/user"
+	"gateway/internal/domain/application/user"
 	"gateway/internal/infrastructure/schemas"
 	"log"
 

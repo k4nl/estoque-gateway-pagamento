@@ -1,8 +1,6 @@
-import { IsString } from 'class-validator';
+import { IsUuid } from 'src/application/common/decorators/validate-user-id.decorator';
 
 export class CreateUserDto {
-  @IsString({
-    message: 'user_id must be a string',
-  })
+  @IsUuid()
   readonly user_id: string;
 }

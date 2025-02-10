@@ -20,7 +20,7 @@ model User {
   created_at DateTime
   updated_at DateTime
 
-  categories Categories[]
+  categories Category[]
 
   @@index([external_id])
   @@index([user_type])
@@ -38,7 +38,7 @@ model Product {
   digital_product DigitalProduct?
   inventory Inventory?
   product_batches ProductBatch[]
-  categories Categories[]
+  categories Category[]
 
   @@index([name])
   @@index([created_at])
@@ -93,7 +93,7 @@ model ProductBatch {
 
 }
 
-model Categories {
+model Category {
   id String @id
   name String @db.VarChar(100)
   responsible_id String 

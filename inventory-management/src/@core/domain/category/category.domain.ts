@@ -4,7 +4,7 @@ import { CategoryProps, CreateCategoryCommand } from './input/category-props';
 export class Category {
   private id: Uuid;
   private name: Name;
-  private responsible_id: Uuid;
+  private responsible_id: Uuid | null;
   private created_at: Date;
   private updated_at: Date;
 
@@ -14,7 +14,9 @@ export class Category {
     this.responsible_id =
       props.responsible_id instanceof Uuid
         ? props.responsible_id
-        : new Uuid(props.responsible_id);
+        : props.responsible_id
+        ? new Uuid(props.responsible_id)
+        : null;
     this.created_at = props.created_at;
     this.updated_at = props.updated_at;
   }
@@ -41,8 +43,8 @@ export class Category {
     return this.name.value;
   }
 
-  public getResponsibleId(): string {
-    return this.responsible_id.value;
+  public getResponsibleId(): string | null {
+    return this.responsible_id ? this.responsible_id.value : null;
   }
 
   public getCreatedAt(): Date {

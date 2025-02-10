@@ -12,3 +12,135 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id        String   @id
+  external_id String @unique @db.Bit(64)
+  user_type   UserType
+  created_at DateTime
+  updated_at DateTime
+
+  categories Categories[]
+
+  @@index([external_id])
+  @@index([user_type])
+}
+
+model Product {
+  id       String   @id
+  name     String  @db.VarChar(100)
+  description String @db.VarChar(255)
+  reservation_type ReservationType
+  created_at DateTime
+  updated_at DateTime
+
+  pyhsical_product PhysicalProduct?
+  digital_product DigitalProduct?
+  inventory Inventory?
+  product_batches ProductBatch[]
+  categories Categories[]
+
+  @@index([name])
+  @@index([created_at])
+  @@index([description])
+  @@index([reservation_type])
+  @@index([name, description])
+  @@index([name, reservation_type])
+  @@index([name, created_at])
+  @@index([name, reservation_type, created_at])
+}
+
+model PhysicalProduct {
+  product_id String @id
+  expiration_date DateTime?
+  perishable Boolean
+
+  product Product @relation(fields: [product_id], references: [id])
+  
+
+  @@index([expiration_date])
+  @@index([perishable])
+  @@index([expiration_date, perishable])
+}
+
+model DigitalProduct {
+  product_id String @id
+  unlimited_inventory Boolean
+
+  product Product @relation(fields: [product_id], references: [id])
+  
+  @@index([unlimited_inventory])
+}
+
+model ProductBatch {
+  id String @id
+  product_id String
+  quantity Decimal @db.Decimal(10, 2)
+  expiration_date DateTime?
+  created_at DateTime
+  updated_at DateTime
+
+  product Product @relation(fields: [product_id], references: [id])
+
+  @@index([product_id])
+  @@index([quantity])
+  @@index([expiration_date])
+  @@index([created_at])
+  @@index([product_id, quantity])
+  @@index([product_id, expiration_date])
+  @@index([product_id, created_at])
+  @@index([product_id, quantity, expiration_date])
+
+}
+
+model Categories {
+  id String @id
+  name String @db.VarChar(100)
+  responsible_id String 
+  created_at DateTime
+  updated_at DateTime
+
+  responsible User @relation(fields: [responsible_id], references: [id])
+  products Product[]
+
+  @@index([name])
+  @@index([created_at])
+  @@index([responsible_id])
+  @@index([name, responsible_id])
+  @@index([name, created_at])
+}
+
+model Inventory {
+  id String @id
+  product_id String @unique
+  quantity Decimal @db.Decimal(10, 2)
+  created_at DateTime
+  updated_at DateTime
+  minimum_stock Decimal? @db.Decimal(10, 2)
+  alert_on_low_stock Boolean
+
+  product Product @relation(fields: [product_id], references: [id])
+
+  @@index([product_id])
+  @@index([created_at])
+  @@index([quantity])
+  @@index([minimum_stock])
+  @@index([alert_on_low_stock])
+  @@index([product_id, quantity])
+  @@index([product_id, minimum_stock])
+  @@index([product_id, alert_on_low_stock])
+  @@index([product_id, created_at])
+  @@index([product_id, quantity, minimum_stock])
+
+}
+
+
+enum ReservationType {
+  reservable
+  non_reservable
+}
+
+enum UserType {
+  admin
+  client
+}

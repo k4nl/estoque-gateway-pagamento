@@ -10,5 +10,9 @@ export class Name extends ValueObject<string> {
     if (this.value.length < 3) {
       throw new Error('Name must be at least 3 characters long');
     }
+
+    if (this.value.length > 100) {
+      throw new Error('Name must be at most 100 characters long');
+    }
   }
 }

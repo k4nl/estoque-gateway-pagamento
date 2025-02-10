@@ -1,15 +1,15 @@
-import { Batch } from '@nestjs/microservices/external/kafka.interface';
 import { Product } from './product.domain';
 import {
   CreatePhysicalProductCommand,
   PhysicalProductProps,
 } from './input/product-props';
 import { Description, Name, Uuid } from 'src/@core/value-object';
+import { ProductBatch } from '../product-batch/product-batch.domain';
 
 export class PhysicalProduct extends Product {
   private expiration_date?: Date;
   private perishable: boolean;
-  private batch: Batch;
+  private batch: Set<ProductBatch>;
 
   constructor(props: PhysicalProductProps) {
     super(props);
@@ -46,7 +46,7 @@ export class PhysicalProduct extends Product {
     return this.perishable;
   }
 
-  public getBatch(): Batch {
+  public getBatches(): Set<ProductBatch> {
     return this.batch;
   }
 }

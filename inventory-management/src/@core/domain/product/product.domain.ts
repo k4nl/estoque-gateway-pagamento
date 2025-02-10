@@ -3,13 +3,14 @@ import { Category } from '../category/category.domain';
 import { Inventory } from '../inventory/inventory.domain';
 import { ReservationType } from 'src/@core/common/enum';
 import { CreateProductCommand, ProductProps } from './input/product-props';
+import { Decimal } from '@prisma/client/runtime/library';
 
 export class Product {
   private id: Uuid;
   private name: Name;
   private description: Description;
   private categories: Set<Category>;
-  private inventory: Inventory;
+  private inventory: Inventory | null;
   private reservation_type: ReservationType;
   private created_at: Date;
   private updated_at: Date;
@@ -29,36 +30,53 @@ export class Product {
   }
 
   public static create(command: CreateProductCommand): Product {
-    return new Product({
+    const product = new Product({
       id: new Uuid(),
       name: new Name(command.name),
       description: new Description(command.description),
       categories: command.categories,
-      inventory: new Inventory(),
+      inventory: command.inventory,
       reservation_type: ReservationType.NON_RESERVABLE,
       created_at: new Date(),
       updated_at: new Date(),
     });
+
+    if (!product.inventory) {
+      product.inventory = Inventory.create({
+        product: product,
+        alert_on_low_stock: false,
+        minimum_stock: null,
+        quantity: new Decimal(0),
+      });
+    }
+
+    return product;
+  }
+
+  // setters
+
+  public setInventory(inventory: Inventory): void {
+    this.inventory = inventory;
   }
 
   // Getters
-  public getId(): Uuid {
-    return this.id;
+  public getId(): string {
+    return this.id.value;
   }
 
-  public getName(): Name {
-    return this.name;
+  public getName(): string {
+    return this.name.value;
   }
 
-  public getDescription(): Description {
-    return this.description;
+  public getDescription(): string {
+    return this.description.value;
   }
 
   public getCategories(): Set<Category> {
     return this.categories;
   }
 
-  public getInventory(): Inventory {
+  public getInventory(): Inventory | null {
     return this.inventory;
   }
 

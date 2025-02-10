@@ -2,7 +2,7 @@ import { Description, Name, Uuid } from 'src/@core/value-object';
 import { Inventory } from '../../inventory/inventory.domain';
 import { ReservationType } from 'src/@core/common/enum';
 import { Category } from '../../category/category.domain';
-import { Batch } from '@nestjs/microservices/external/kafka.interface';
+import { ProductBatch } from '../../product-batch/product-batch.domain';
 
 export type ProductProps = {
   id: string | Uuid;
@@ -22,14 +22,14 @@ export type DigitalProductProps = ProductProps & {
 export type PhysicalProductProps = ProductProps & {
   expiration_date?: Date;
   perishable: boolean;
-  batch: Batch;
+  batch: Set<ProductBatch>;
 };
 
 export type CreateProductCommand = {
   name: string;
   description: string;
   categories: Set<Category>;
-  inventory: Inventory;
+  inventory?: Inventory;
   reservation_type: ReservationType;
 };
 
@@ -40,5 +40,5 @@ export type CreateDigitalProductCommand = CreateProductCommand & {
 export type CreatePhysicalProductCommand = CreateProductCommand & {
   expiration_date?: Date;
   perishable: boolean;
-  batch: Batch;
+  batch: Set<ProductBatch>;
 };

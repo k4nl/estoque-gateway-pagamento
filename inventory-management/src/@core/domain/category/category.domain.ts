@@ -30,4 +30,26 @@ export class Category {
       updated_at: new Date(),
     });
   }
+
+  // Getters
+
+  public getId(): string {
+    return this.id.value;
+  }
+
+  public getName(): string {
+    return this.name.value;
+  }
+
+  public getResponsibleId(): string {
+    return this.responsible_id.value;
+  }
+
+  public getCreatedAt(): Date {
+    return this.created_at;
+  }
+
+  public getUpdatedAt(): Date {
+    return this.updated_at;
+  }
 }

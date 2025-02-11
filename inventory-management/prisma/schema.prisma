@@ -108,6 +108,8 @@ model Category {
   @@index([responsible_id])
   @@index([name, responsible_id])
   @@index([name, created_at])
+
+  @@unique([name, responsible_id])
 }
 
 model Inventory {

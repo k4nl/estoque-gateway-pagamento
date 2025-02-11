@@ -15,7 +15,7 @@ export class CategoryMapper {
     return {
       created_at: category.getCreatedAt(),
       id: category.getId(),
-      name: category.getName(),
+      name: category.getName().toLowerCase(),
       updated_at: category.getUpdatedAt(),
       responsible_id: category.getResponsibleId(),
     };

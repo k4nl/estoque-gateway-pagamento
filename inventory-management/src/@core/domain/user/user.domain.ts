@@ -35,12 +35,12 @@ export class User {
     });
   }
 
-  public getId(): Uuid {
-    return this.id;
+  public getId(): string {
+    return this.id.value;
   }
 
-  public getExternalId(): Uuid {
-    return this.external_id;
+  public getExternalId(): string {
+    return this.external_id.value;
   }
 
   public getUserType(): UserType {

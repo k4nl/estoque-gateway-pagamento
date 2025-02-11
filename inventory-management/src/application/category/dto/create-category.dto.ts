@@ -1,5 +1,4 @@
-import { IsOptional, IsString, Length } from 'class-validator';
-import { IsUuid } from 'src/application/common/decorators/validate-user-id.decorator';
+import { IsString, Length } from 'class-validator';
 
 export class CreateCategoryDTO {
   @IsString({
@@ -9,8 +8,4 @@ export class CreateCategoryDTO {
     message: 'category name must be between 3 and 100 characters',
   })
   name: string;
-
-  @IsOptional()
-  @IsUuid()
-  responsible_id?: string;
 }

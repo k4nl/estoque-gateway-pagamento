@@ -33,6 +33,7 @@ export class PhysicalProduct extends Product {
       expiration_date: command.expiration_date,
       perishable: command.perishable,
       batch: command.batch,
+      user: command.user,
     });
   }
 

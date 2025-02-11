@@ -13,11 +13,14 @@ import { Category } from 'src/@core/domain/category/category.domain';
 import { Inventory } from 'src/@core/domain/inventory/inventory.domain';
 import { ReservationType } from 'src/@core/common/enum';
 import { ProductBatch } from 'src/@core/domain/product-batch/product-batch.domain';
+import { User } from 'src/@core/domain/user/user.domain';
+import { UserType } from 'src/@core/common/user-type';
+import { Decimal } from '@prisma/client/runtime/library';
 
 export class ProductMapper {
   public static toDatabase(
     product: DigitalProductDomain | PhysicalProductDomain | ProductDomain,
-  ): ProductModelExtended | ProductModel {
+  ): Omit<ToProductModelExtended, 'user'> {
     if (product instanceof DigitalProductDomain) {
       return this.toDatabaseDigitalProduct(product);
     }
@@ -36,7 +39,7 @@ export class ProductMapper {
   public static toDomain(
     product: ProductModelExtended,
   ): ProductDomain | PhysicalProductDomain | DigitalProductDomain {
-    if (product.pyhsical_product) {
+    if (product.physical_product) {
       return this.toPhysicalProduct(product);
     }
 
@@ -58,6 +61,14 @@ export class ProductMapper {
       (batch) => new ProductBatch(batch),
     );
 
+    const userType: string = Object.values($Enums.UserType).find(
+      (userType) => userType === product.user.user_type,
+    );
+
+    if (!userType) {
+      throw new Error('Invalid user type');
+    }
+
     const physical_product = new PhysicalProductDomain({
       id: product.id,
       name: product.name,
@@ -67,9 +78,16 @@ export class ProductMapper {
       reservation_type: product.reservation_type as ReservationType,
       created_at: product.created_at,
       updated_at: product.updated_at,
-      expiration_date: product.pyhsical_product.expiration_date,
-      perishable: product.pyhsical_product.perishable,
+      expiration_date: product.physical_product.expiration_date,
+      perishable: product.physical_product.perishable,
       batch: new Set(batches),
+      user: new User({
+        created_at: product.user.created_at,
+        external_id: product.user.external_id,
+        updated_at: product.user.updated_at,
+        user_type: UserType[product.user.user_type],
+        id: product.user.id,
+      }),
     });
 
     if (product.inventory) {
@@ -96,6 +114,14 @@ export class ProductMapper {
       (category) => new Category(category),
     );
 
+    const userType: string = Object.values($Enums.UserType).find(
+      (userType) => userType === product.user.user_type,
+    );
+
+    if (!userType) {
+      throw new Error('Invalid user type');
+    }
+
     const digital_product = new DigitalProductDomain({
       id: product.id,
       name: product.name,
@@ -106,6 +132,13 @@ export class ProductMapper {
       created_at: product.created_at,
       updated_at: product.updated_at,
       unlimited_inventory: product.digital_product.unlimited_inventory,
+      user: new User({
+        created_at: product.user.created_at,
+        external_id: product.user.external_id,
+        updated_at: product.user.updated_at,
+        user_type: UserType[product.user.user_type],
+        id: product.user.id,
+      }),
     });
 
     if (product.inventory) {
@@ -130,6 +163,14 @@ export class ProductMapper {
       (category) => new Category(category),
     );
 
+    const userType: string = Object.values($Enums.UserType).find(
+      (userType) => userType === product.user.user_type,
+    );
+
+    if (!userType) {
+      throw new Error('Invalid user type');
+    }
+
     const product_domain = new ProductDomain({
       id: product.id,
       name: product.name,
@@ -139,6 +180,13 @@ export class ProductMapper {
       reservation_type: product.reservation_type as ReservationType,
       created_at: product.created_at,
       updated_at: product.updated_at,
+      user: new User({
+        created_at: product.user.created_at,
+        external_id: product.user.external_id,
+        updated_at: product.user.updated_at,
+        user_type: UserType[product.user.user_type],
+        id: product.user.id,
+      }),
     });
 
     if (product.inventory) {
@@ -179,7 +227,8 @@ export class ProductMapper {
       reservation_type: reservation_type,
       created_at: product.getCreatedAt(),
       updated_at: product.getUpdatedAt(),
-      pyhsical_product: {
+      user_id: product.getResponsibleId(),
+      physical_product: {
         expiration_date: product.getExpirationDate(),
         perishable: product.getPerishable(),
         product_id: product.getId(),
@@ -196,26 +245,20 @@ export class ProductMapper {
             updated_at: inventory.getUpdatedAt(),
           }
         : null,
-      categories: Array.from(product.getCategories()).map(
-        (category) =>
-          new Category({
-            id: category.getId(),
-            created_at: category.getCreatedAt(),
-            name: category.getName(),
-            responsible_id: category.getResponsibleId(),
-            updated_at: category.getUpdatedAt(),
-          }),
-      ),
-      product_batches: Array.from(product.getBatches()).map(
-        (batch) =>
-          new ProductBatch({
-            id: batch.getId(),
-            quantity: batch.getQuantity(),
-            created_at: batch.getCreatedAt(),
-            updated_at: batch.getUpdatedAt(),
-            expiration_date: batch.getExpirationDate(),
-          }),
-      ),
+      categories: Array.from(product.getCategories()).map((category) => ({
+        id: category.getId(),
+        created_at: category.getCreatedAt(),
+        name: category.getName(),
+        responsible_id: category.getResponsibleId(),
+        updated_at: category.getUpdatedAt(),
+      })),
+      product_batches: Array.from(product.getBatches()).map((batch) => ({
+        id: batch.getId(),
+        quantity: batch.getQuantity(),
+        created_at: batch.getCreatedAt(),
+        updated_at: batch.getUpdatedAt(),
+        expiration_date: batch.getExpirationDate(),
+      })),
     };
   }
 
@@ -240,20 +283,18 @@ export class ProductMapper {
       reservation_type: reservation_type,
       created_at: product.getCreatedAt(),
       updated_at: product.getUpdatedAt(),
+      user_id: product.getResponsibleId(),
       digital_product: {
         unlimited_inventory: product.getUnlimitedInventory(),
         product_id: product.getId(),
       },
-      categories: Array.from(product.getCategories()).map(
-        (category) =>
-          new Category({
-            id: category.getId(),
-            created_at: category.getCreatedAt(),
-            name: category.getName(),
-            responsible_id: category.getResponsibleId(),
-            updated_at: category.getUpdatedAt(),
-          }),
-      ),
+      categories: Array.from(product.getCategories()).map((category) => ({
+        id: category.getId(),
+        created_at: category.getCreatedAt(),
+        name: category.getName(),
+        responsible_id: category.getResponsibleId(),
+        updated_at: category.getUpdatedAt(),
+      })),
       inventory: inventory
         ? {
             alert_on_low_stock: inventory.getAlertOnLowStock(),
@@ -265,12 +306,14 @@ export class ProductMapper {
             updated_at: inventory.getUpdatedAt(),
           }
         : null,
-      pyhsical_product: null,
+      physical_product: null,
       product_batches: null,
     };
   }
 
-  private static toDatabaseProduct(product: ProductDomain): ProductModel {
+  private static toDatabaseProduct(
+    product: ProductDomain,
+  ): ToProductModelExtended {
     const reservation_type = Object.values($Enums.ReservationType).find(
       (resevation_type) =>
         resevation_type === product.getReservationType().toLocaleLowerCase(),
@@ -287,18 +330,41 @@ export class ProductMapper {
       reservation_type: reservation_type,
       created_at: product.getCreatedAt(),
       updated_at: product.getUpdatedAt(),
+      user_id: product.getResponsibleId(),
+      categories: Array.from(product.getCategories()).map((category) => ({
+        id: category.getId(),
+        created_at: category.getCreatedAt(),
+        name: category.getName(),
+        responsible_id: category.getResponsibleId(),
+        updated_at: category.getUpdatedAt(),
+      })),
+      digital_product: null,
+      physical_product: null,
+      inventory: product.getInventory()
+        ? {
+            alert_on_low_stock: product.getInventory().getAlertOnLowStock(),
+            created_at: product.getInventory().getCreatedAt(),
+            id: product.getInventory().getId(),
+            minimum_stock: product.getInventory().getMinimumStock(),
+            product_id: product.getInventory().getProduct().getId(),
+            quantity: product.getInventory().getQuantity(),
+            updated_at: product.getInventory().getUpdatedAt(),
+          }
+        : null,
+      product_batches: null,
     };
   }
 }
 
 type ProductModelExtended = Prisma.ProductGetPayload<{
   include: {
+    user: true;
     digital_product: {
       select: {
         unlimited_inventory: boolean;
       };
     };
-    pyhsical_product: {
+    physical_product: {
       select: {
         expiration_date: true;
         perishable: true;
@@ -329,8 +395,20 @@ type ProductModelExtended = Prisma.ProductGetPayload<{
 
 type ToProductModelExtended = ProductModel & {
   digital_product: DigitalProductModel | null;
-  pyhsical_product: PhysicalProductModel | null;
-  categories: Category[];
-  product_batches: ProductBatch[] | null;
+  physical_product: PhysicalProductModel | null;
+  categories: {
+    id: string;
+    created_at: Date;
+    updated_at: Date;
+    name: string;
+    responsible_id: string;
+  }[];
+  product_batches: {
+    id: string;
+    quantity: Decimal;
+    created_at: Date;
+    updated_at: Date;
+    expiration_date: Date;
+  }[];
   inventory: InventoryModel | null;
 };

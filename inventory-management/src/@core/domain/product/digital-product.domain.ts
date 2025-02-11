@@ -26,6 +26,7 @@ export class DigitalProduct extends Product {
       created_at: new Date(),
       updated_at: new Date(),
       unlimited_inventory: command.unlimited_inventory,
+      user: command.user,
     });
   }
 

@@ -3,6 +3,7 @@ import { Inventory } from '../../inventory/inventory.domain';
 import { ReservationType } from 'src/@core/common/enum';
 import { Category } from '../../category/category.domain';
 import { ProductBatch } from '../../product-batch/product-batch.domain';
+import { User } from '../../user/user.domain';
 
 export type ProductProps = {
   id: string | Uuid;
@@ -13,6 +14,7 @@ export type ProductProps = {
   reservation_type: ReservationType;
   created_at: Date;
   updated_at: Date;
+  user: User;
 };
 
 export type DigitalProductProps = ProductProps & {
@@ -31,6 +33,7 @@ export type CreateProductCommand = {
   categories: Set<Category>;
   inventory?: Inventory;
   reservation_type: ReservationType;
+  user: User;
 };
 
 export type CreateDigitalProductCommand = CreateProductCommand & {

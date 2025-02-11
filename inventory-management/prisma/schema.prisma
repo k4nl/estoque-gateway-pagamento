@@ -21,6 +21,7 @@ model User {
   updated_at DateTime
 
   categories Category[]
+  products Product[]
 
   @@index([external_id])
   @@index([user_type])
@@ -31,23 +32,27 @@ model Product {
   name     String  @db.VarChar(100)
   description String @db.VarChar(255)
   reservation_type ReservationType
+  user_id String
   created_at DateTime
   updated_at DateTime
 
-  pyhsical_product PhysicalProduct?
+  physical_product PhysicalProduct?
   digital_product DigitalProduct?
   inventory Inventory?
   product_batches ProductBatch[]
   categories Category[]
 
-  @@index([name])
-  @@index([created_at])
-  @@index([description])
-  @@index([reservation_type])
-  @@index([name, description])
-  @@index([name, reservation_type])
-  @@index([name, created_at])
-  @@index([name, reservation_type, created_at])
+  user User @relation(fields: [user_id], references: [id])
+
+  @@index([name, user_id])
+  @@index([created_at, user_id])
+  @@index([description, user_id])
+  @@index([reservation_type, user_id])
+  @@index([name, description, user_id])
+  @@index([name, reservation_type, user_id])
+  @@index([name, created_at, user_id])
+  @@index([name, reservation_type, created_at, user_id])
+  @@unique([name, user_id])
 }
 
 model PhysicalProduct {

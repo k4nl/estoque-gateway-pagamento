@@ -4,6 +4,7 @@ import { Inventory } from '../inventory/inventory.domain';
 import { ReservationType } from 'src/@core/common/enum';
 import { CreateProductCommand, ProductProps } from './input/product-props';
 import { Decimal } from '@prisma/client/runtime/library';
+import { User } from '../user/user.domain';
 
 export class Product {
   private id: Uuid;
@@ -12,6 +13,7 @@ export class Product {
   private categories: Set<Category>;
   private inventory: Inventory | null;
   private reservation_type: ReservationType;
+  private user: User;
   private created_at: Date;
   private updated_at: Date;
 
@@ -27,6 +29,7 @@ export class Product {
     this.reservation_type = props.reservation_type;
     this.created_at = props.created_at;
     this.updated_at = props.updated_at;
+    this.user = props.user;
   }
 
   public static create(command: CreateProductCommand): Product {
@@ -36,9 +39,10 @@ export class Product {
       description: new Description(command.description),
       categories: command.categories,
       inventory: command.inventory,
-      reservation_type: ReservationType.NON_RESERVABLE,
+      reservation_type: command.reservation_type,
       created_at: new Date(),
       updated_at: new Date(),
+      user: command.user,
     });
 
     if (!product.inventory) {
@@ -90,5 +94,18 @@ export class Product {
 
   public getUpdatedAt(): Date {
     return this.updated_at;
+  }
+
+  public getResponsibleId(): string {
+    return this.user.getId();
+  }
+
+  public addCategory(category: Category): void {
+    if (this.categories.has(category)) {
+      throw new Error('Category already added');
+    }
+
+    this.categories.add(category);
+    this.updated_at = new Date();
   }
 }

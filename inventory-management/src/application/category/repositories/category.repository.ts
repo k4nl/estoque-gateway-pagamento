@@ -17,10 +17,27 @@ export class CategoryRepository {
   }
 
   async getAll(filter: GetAllCategoriesFilter) {
+    const category_name = {
+      startsWith: undefined,
+      in: undefined,
+    };
+
+    const is_category_name_string = filter.name
+      ? typeof filter.name === 'string'
+      : false;
+
+    if (is_category_name_string) {
+      category_name.startsWith = filter.name;
+    }
+
+    if (!is_category_name_string && filter.name) {
+      category_name.in = filter.name;
+    }
+
     const [categories, total] = await Promise.all([
       this.database.category.findMany({
         where: {
-          name: filter.name,
+          name: category_name,
           created_at: filter.created_at,
           responsible_id: filter.responsible_id,
         },
@@ -29,7 +46,7 @@ export class CategoryRepository {
       }),
       this.database.category.count({
         where: {
-          name: filter.name,
+          name: category_name,
           created_at: filter.created_at,
           responsible_id: filter.responsible_id,
         },
@@ -40,6 +57,18 @@ export class CategoryRepository {
       categories: categories.map(CategoryMapper.toDomain),
       total,
     };
+  }
+
+  async getAllByIds(category_ids: string[]): Promise<Set<CategoryDomain>> {
+    const categories = await this.database.category.findMany({
+      where: {
+        id: {
+          in: category_ids,
+        },
+      },
+    });
+
+    return new Set(categories.map(CategoryMapper.toDomain));
   }
 
   async findById(category_id: string): Promise<CategoryDomain | null> {

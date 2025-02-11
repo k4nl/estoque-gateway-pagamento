@@ -32,8 +32,8 @@ export class ProductBatch {
 
   // Getters
 
-  public getId(): Uuid {
-    return this.id;
+  public getId(): string {
+    return this.id.value;
   }
 
   public getQuantity(): Decimal {

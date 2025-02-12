@@ -81,7 +81,9 @@ export class ProductRepository {
         },
         product_batches: productModel.product_batches
           ? {
-              create: productModel.product_batches,
+              createMany: {
+                data: productModel.product_batches,
+              },
             }
           : undefined,
         digital_product: productModel.digital_product
@@ -115,8 +117,7 @@ export class ProductRepository {
               update: {
                 where: { product_id: productModel.id },
                 data: {
-                  unlimited_inventory:
-                    productModel.digital_product.unlimited_inventory,
+                  url: productModel.digital_product.url,
                 },
               },
             }
@@ -192,5 +193,11 @@ export class ProductRepository {
       products: new Set(products.map(ProductMapper.toDomain)),
       total,
     };
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.database.product.delete({
+      where: { id },
+    });
   }
 }

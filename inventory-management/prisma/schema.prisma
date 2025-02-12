@@ -41,6 +41,7 @@ model Product {
   inventory Inventory?
   product_batches ProductBatch[]
   categories Category[]
+  product_reservation ProductReservation[]
 
   user User @relation(fields: [user_id], references: [id])
 
@@ -53,6 +54,7 @@ model Product {
   @@index([name, created_at, user_id])
   @@index([name, reservation_type, created_at, user_id])
   @@unique([name, user_id])
+  
 }
 
 model PhysicalProduct {
@@ -70,11 +72,13 @@ model PhysicalProduct {
 
 model DigitalProduct {
   product_id String @id
-  unlimited_inventory Boolean
+  url String
 
   product Product @relation(fields: [product_id], references: [id])
   
-  @@index([unlimited_inventory])
+  @@index([url])
+
+  @@unique([url, product_id])
 }
 
 model ProductBatch {
@@ -96,6 +100,28 @@ model ProductBatch {
   @@index([product_id, created_at])
   @@index([product_id, quantity, expiration_date])
 
+}
+
+model ProductReservation {
+  id String @id
+  product_id String
+  external_id String @unique
+  quantity Decimal @db.Decimal(10, 2)
+  status ReservationStatus
+  created_at DateTime
+  updated_at DateTime
+
+  product Product @relation(fields: [product_id], references: [id])
+
+  @@index([product_id])
+  @@index([external_id])
+  @@index([created_at])
+  @@index([status])
+  @@index([product_id, external_id])
+  @@index([product_id, status])
+  @@index([product_id, created_at])
+  @@index([product_id, external_id, created_at, status])
+  
 }
 
 model Category {
@@ -139,6 +165,12 @@ model Inventory {
   @@index([product_id, created_at])
   @@index([product_id, quantity, minimum_stock])
 
+}
+
+enum ReservationStatus {
+  released
+  reserved
+  canceled
 }
 
 

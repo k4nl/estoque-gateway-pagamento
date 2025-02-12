@@ -2,15 +2,17 @@ import { Description, Name, Uuid } from 'src/@core/value-object';
 import {
   CreateDigitalProductCommand,
   DigitalProductProps,
+  UpdateDigitalProductCommand,
 } from './input/product-props';
 import { Product } from './product.domain';
+import { ProductBatch } from '../product-batch/product-batch.domain';
 
 export class DigitalProduct extends Product {
-  private unlimited_inventory: boolean;
+  private url: URL;
 
   constructor(props: DigitalProductProps) {
     super(props);
-    this.unlimited_inventory = props.unlimited_inventory;
+    this.setUrl(props.url);
   }
 
   public static override create(
@@ -25,13 +27,35 @@ export class DigitalProduct extends Product {
       reservation_type: command.reservation_type,
       created_at: new Date(),
       updated_at: new Date(),
-      unlimited_inventory: command.unlimited_inventory,
+      url: command.url,
       user: command.user,
+      batch: new Set<ProductBatch>(),
     });
   }
 
   // Getters
-  public getUnlimitedInventory(): boolean {
-    return this.unlimited_inventory;
+  public getUrl(): string {
+    return this.url.toString();
+  }
+
+  private setUrl(url: string | URL): void {
+    try {
+      if (url instanceof URL) {
+        this.url = url;
+        return;
+      }
+
+      const newUrl = new URL(url);
+      this.url = newUrl;
+    } catch (error) {
+      throw new Error('Invalid URL');
+    }
+  }
+
+  public override update(command: UpdateDigitalProductCommand): void {
+    if (command.url) {
+      this.setUrl(command.url);
+    }
+    super.update(command);
   }
 }

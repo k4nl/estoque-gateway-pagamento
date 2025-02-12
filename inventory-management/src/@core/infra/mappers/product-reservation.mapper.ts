@@ -1,0 +1,52 @@
+import {
+  $Enums,
+  ProductReservation as ProductReservationModel,
+} from '@prisma/client';
+import { ReservationStatus } from 'src/@core/common/enum';
+import { ProductReservation as ProductReservationDomain } from 'src/@core/domain/product-reservation/product-reservation.domain';
+
+export class ProductReservationMapper {
+  public static toDomain(
+    productReservation: ProductReservationModel,
+  ): ProductReservationDomain {
+    const reservation_status = Object.values(ReservationStatus).find(
+      (resevation_type) => resevation_type === productReservation.status,
+    );
+
+    if (!reservation_status) {
+      throw new Error('Invalid reservation type');
+    }
+
+    return new ProductReservationDomain({
+      id: productReservation.id,
+      product_id: productReservation.product_id,
+      reservation_id: productReservation.external_id,
+      quantity: productReservation.quantity,
+      status: ReservationStatus[reservation_status],
+      created_at: productReservation.created_at,
+      updated_at: productReservation.updated_at,
+    });
+  }
+
+  public static toDatabase(
+    productReservation: ProductReservationDomain,
+  ): ProductReservationModel {
+    const reservation_status = Object.values($Enums.ReservationStatus).find(
+      (resevation_type) => resevation_type === productReservation.getStatus(),
+    );
+
+    if (!reservation_status) {
+      throw new Error('Invalid reservation type');
+    }
+
+    return {
+      id: productReservation.getId(),
+      product_id: productReservation.getProductId(),
+      external_id: productReservation.getReservationId(),
+      quantity: productReservation.getQuantity(),
+      status: reservation_status,
+      created_at: productReservation.getCreatedAt(),
+      updated_at: productReservation.getUpdatedAt(),
+    };
+  }
+}

@@ -13,7 +13,7 @@ import { CreateProductDTO } from './dto/create-product.dto';
 import { User } from 'src/@core/domain/user/user.domain';
 import { Roles } from '../common/decorators/roles.decorator';
 import { UserType } from 'src/@core/common/user-type';
-import { AddProductCategoryDTO } from './dto/add-product-category.dto';
+import { ProductCategoryDTO } from './dto/add-product-category.dto';
 
 @Controller('product')
 export class ProductController {
@@ -39,7 +39,7 @@ export class ProductController {
   @Roles(UserType.CLIENT)
   @Post('/:id/add-categories')
   async addProductCategory(
-    @Body() addProductCategoryDTO: AddProductCategoryDTO,
+    @Body() addProductCategoryDTO: ProductCategoryDTO,
     @Param() product_id: string,
     @GetUser() user: User,
   ) {

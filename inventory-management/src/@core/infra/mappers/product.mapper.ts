@@ -114,6 +114,10 @@ export class ProductMapper {
       (category) => new Category(category),
     );
 
+    const batches = product.product_batches.map(
+      (batch) => new ProductBatch(batch),
+    );
+
     const userType: string = Object.values($Enums.UserType).find(
       (userType) => userType === product.user.user_type,
     );
@@ -131,7 +135,8 @@ export class ProductMapper {
       reservation_type: product.reservation_type as ReservationType,
       created_at: product.created_at,
       updated_at: product.updated_at,
-      unlimited_inventory: product.digital_product.unlimited_inventory,
+      url: product.digital_product.url,
+      batch: new Set(batches),
       user: new User({
         created_at: product.user.created_at,
         external_id: product.user.external_id,
@@ -167,6 +172,10 @@ export class ProductMapper {
       (userType) => userType === product.user.user_type,
     );
 
+    const batches = product.product_batches.map(
+      (batch) => new ProductBatch(batch),
+    );
+
     if (!userType) {
       throw new Error('Invalid user type');
     }
@@ -180,6 +189,7 @@ export class ProductMapper {
       reservation_type: product.reservation_type as ReservationType,
       created_at: product.created_at,
       updated_at: product.updated_at,
+      batch: new Set(batches),
       user: new User({
         created_at: product.user.created_at,
         external_id: product.user.external_id,
@@ -285,8 +295,8 @@ export class ProductMapper {
       updated_at: product.getUpdatedAt(),
       user_id: product.getResponsibleId(),
       digital_product: {
-        unlimited_inventory: product.getUnlimitedInventory(),
         product_id: product.getId(),
+        url: product.getUrl(),
       },
       categories: Array.from(product.getCategories()).map((category) => ({
         id: category.getId(),
@@ -361,7 +371,7 @@ type ProductModelExtended = Prisma.ProductGetPayload<{
     user: true;
     digital_product: {
       select: {
-        unlimited_inventory: boolean;
+        url: true;
       };
     };
     physical_product: {

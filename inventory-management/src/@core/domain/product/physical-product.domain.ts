@@ -4,18 +4,15 @@ import {
   PhysicalProductProps,
 } from './input/product-props';
 import { Description, Name, Uuid } from 'src/@core/value-object';
-import { ProductBatch } from '../product-batch/product-batch.domain';
 
 export class PhysicalProduct extends Product {
   private expiration_date?: Date;
   private perishable: boolean;
-  private batch: Set<ProductBatch>;
 
   constructor(props: PhysicalProductProps) {
     super(props);
     this.expiration_date = props.expiration_date;
     this.perishable = props.perishable;
-    this.batch = props.batch;
   }
 
   public static override create(
@@ -45,9 +42,5 @@ export class PhysicalProduct extends Product {
 
   public getPerishable(): boolean {
     return this.perishable;
-  }
-
-  public getBatches(): Set<ProductBatch> {
-    return this.batch;
   }
 }

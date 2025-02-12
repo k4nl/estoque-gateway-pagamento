@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ProductRepository } from '../repositories/product.repository';
 import { GetProductService } from './get-product.service';
-import { AddProductCategoryDTO } from '../dto/add-product-category.dto';
+import { ProductCategoryDTO } from '../dto/add-product-category.dto';
 import { User } from 'src/@core/domain/user/user.domain';
 import { CategoryRepository } from 'src/application/category/repositories/category.repository';
 import { ResponseDTO } from 'src/application/common/dto/response.dto';
@@ -15,19 +15,21 @@ export class AddProductCategoryService {
   ) {}
 
   async execute(
-    addProductCategoryDTO: AddProductCategoryDTO,
+    productCategoryDTO: ProductCategoryDTO,
     product_id: string,
     user: User,
   ): Promise<ResponseDTO<null>> {
     const [product, categories] = await Promise.all([
       this.getProductService.execute(product_id, user),
       this.categoryRepository.getAllByIds(
-        Array.from(addProductCategoryDTO.category_ids),
+        Array.from(productCategoryDTO.category_ids),
       ),
     ]);
 
     for (const category of categories) {
-      if (category.getResponsibleId() !== user.getId()) {
+      const category_responsible = category.getResponsibleId();
+
+      if (category_responsible && category_responsible !== user.getId()) {
         throw new Error(
           `You are not allowed to add category ${category.getName()}`,
         );

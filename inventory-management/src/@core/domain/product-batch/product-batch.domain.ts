@@ -51,4 +51,14 @@ export class ProductBatch {
   public getUpdatedAt(): Date {
     return this.updated_at;
   }
+
+  public decrementQuantity(quantity: Decimal) {
+    const isNegative = this.quantity.minus(quantity).lessThan(0);
+
+    if (isNegative) {
+      throw new Error('Not enough quantity to reserve');
+    }
+
+    this.quantity = this.quantity.minus(quantity);
+  }
 }

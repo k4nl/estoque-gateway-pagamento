@@ -1,3 +1,3 @@
-export class AddProductCategoryDTO {
+export class ProductCategoryDTO {
   category_ids: string[];
 }

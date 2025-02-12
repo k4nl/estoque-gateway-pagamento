@@ -1,9 +1,15 @@
 export enum ReservationType {
-  RESERVABLE = 'RESERVABLE',
-  NON_RESERVABLE = 'NON_RESERVABLE',
+  RESERVABLE = 'reservable',
+  NON_RESERVABLE = 'non_reservable',
 }
 
 export enum Roles {
-  ADMIN = 'ADMIN',
-  USER = 'USER',
+  ADMIN = 'admin',
+  USER = 'user',
+}
+
+export enum ReservationStatus {
+  RELEASED = 'released',
+  RESERVED = 'reserved',
+  CANCELED = 'canceled',
 }

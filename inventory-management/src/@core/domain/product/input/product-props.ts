@@ -4,12 +4,14 @@ import { ReservationType } from 'src/@core/common/enum';
 import { Category } from '../../category/category.domain';
 import { ProductBatch } from '../../product-batch/product-batch.domain';
 import { User } from '../../user/user.domain';
+import { Decimal } from '@prisma/client/runtime/library';
 
 export type ProductProps = {
   id: string | Uuid;
   name: string | Name;
   description: string | Description;
   categories: Set<Category>;
+  batch: Set<ProductBatch>;
   inventory: Inventory;
   reservation_type: ReservationType;
   created_at: Date;
@@ -18,13 +20,12 @@ export type ProductProps = {
 };
 
 export type DigitalProductProps = ProductProps & {
-  unlimited_inventory: boolean;
+  url: string | URL;
 };
 
 export type PhysicalProductProps = ProductProps & {
   expiration_date?: Date;
   perishable: boolean;
-  batch: Set<ProductBatch>;
 };
 
 export type CreateProductCommand = {
@@ -37,11 +38,26 @@ export type CreateProductCommand = {
 };
 
 export type CreateDigitalProductCommand = CreateProductCommand & {
-  unlimited_inventory: boolean;
+  url: string | URL;
 };
 
 export type CreatePhysicalProductCommand = CreateProductCommand & {
   expiration_date?: Date;
   perishable: boolean;
   batch: Set<ProductBatch>;
+};
+
+export type UpdateProductCommand = {
+  description?: string;
+  reservation_type?: ReservationType;
+};
+
+export type ReserveProductCommand = {
+  reservation_id: string;
+  quantity: Decimal;
+  batch: ProductBatch;
+};
+
+export type UpdateDigitalProductCommand = UpdateProductCommand & {
+  url?: string | URL;
 };

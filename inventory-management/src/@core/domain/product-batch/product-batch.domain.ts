@@ -61,4 +61,8 @@ export class ProductBatch {
 
     this.quantity = this.quantity.minus(quantity);
   }
+
+  public incrementQuantity(quantity: Decimal) {
+    this.quantity = this.quantity.plus(quantity);
+  }
 }

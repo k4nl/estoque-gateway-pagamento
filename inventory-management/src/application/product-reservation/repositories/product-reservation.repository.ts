@@ -7,11 +7,14 @@ import { DatabaseService } from 'src/config/database/database.service';
 export class ProductReservationRepository {
   constructor(private readonly database: DatabaseService) {}
 
-  async findReservationById(id: string): Promise<ProductReservation | null> {
+  async findReservationByExternalIdId(
+    external_id: string,
+  ): Promise<ProductReservation | null> {
     const reservation = await this.database.productReservation.findUnique({
       where: {
-        id,
+        external_id,
       },
+      include: { batch: true },
     });
 
     if (!reservation) {

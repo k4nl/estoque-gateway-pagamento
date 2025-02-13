@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { User } from 'src/@core/domain/user/user.domain';
-import { GetProductService } from './get-product.service';
-import { ProductReservationDTO } from '../dto/product-reservation.dto';
 import { Decimal } from '@prisma/client/runtime/library';
 import { ProductReservationRepository } from 'src/application/product-reservation/repositories/product-reservation.repository';
-import { ReserveProductRepository } from '../repositories/reserve-product.repository';
+import { ReserveProductRepository } from '../../product-reservation/repositories/reserve-product.repository';
+import { GetProductService } from 'src/application/product/services';
+import { ProductReservationDTO } from '../dto/product-reservation.dto';
 
 @Injectable()
 export class ReserveProductService {
@@ -22,7 +22,7 @@ export class ReserveProductService {
     const product = await this.getProductService.execute(product_id, user);
 
     const is_reserverd =
-      await this.productReservationRepository.findReservationById(
+      await this.productReservationRepository.findReservationByExternalIdId(
         reserveProductDTO.reservation_id,
       );
 

@@ -4,7 +4,6 @@ import { DatabaseService } from 'src/config/database/database.service';
 
 import { ProductReservationMapper } from 'src/@core/infra/mappers/product-reservation.mapper';
 import { ProductBatch } from 'src/@core/domain/product-batch/product-batch.domain';
-import { ReservationStatus } from 'src/@core/common/enum';
 
 @Injectable()
 export class ReserveProductRepository {
@@ -51,7 +50,7 @@ export class ReserveProductRepository {
           id: productReservation.getId(),
         },
         data: {
-          status: ReservationStatus.RELEASED,
+          status: productReservation.getStatus(),
         },
       });
     });
@@ -67,7 +66,7 @@ export class ReserveProductRepository {
           id: productReservation.getId(),
         },
         data: {
-          status: ReservationStatus.CANCELED,
+          status: productReservation.getStatus(),
         },
       });
 

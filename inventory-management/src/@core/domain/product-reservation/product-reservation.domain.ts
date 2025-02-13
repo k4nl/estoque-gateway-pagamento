@@ -5,11 +5,13 @@ import {
   CreateProductReservationCommand,
   ProductReservationProps,
 } from './input/product-reservation.props';
+import { ProductBatch } from '../product-batch/product-batch.domain';
 
 export class ProductReservation {
   private id: Uuid;
   private reservation_id: Uuid;
   private product_id: Uuid;
+  private batch: ProductBatch;
   private quantity: Decimal;
   private status: ReservationStatus;
   private created_at: Date;
@@ -29,6 +31,7 @@ export class ProductReservation {
     this.status = props.status;
     this.created_at = props.created_at;
     this.updated_at = props.updated_at;
+    this.batch = props.batch;
   }
 
   public static create(command: CreateProductReservationCommand) {
@@ -40,6 +43,7 @@ export class ProductReservation {
       status: command.status,
       created_at: new Date(),
       updated_at: new Date(),
+      batch: command.batch,
     });
   }
 
@@ -71,6 +75,10 @@ export class ProductReservation {
 
   public getUpdatedAt(): Date {
     return this.updated_at;
+  }
+
+  public getBatch(): ProductBatch {
+    return this.batch;
   }
 
   // Setters

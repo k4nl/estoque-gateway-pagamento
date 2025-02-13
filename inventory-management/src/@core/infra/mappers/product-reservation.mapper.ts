@@ -1,13 +1,15 @@
 import {
   $Enums,
+  Prisma,
   ProductReservation as ProductReservationModel,
 } from '@prisma/client';
 import { ReservationStatus } from 'src/@core/common/enum';
 import { ProductReservation as ProductReservationDomain } from 'src/@core/domain/product-reservation/product-reservation.domain';
+import { ProductBatch as ProductBatchDomain } from 'src/@core/domain/product-batch/product-batch.domain';
 
 export class ProductReservationMapper {
   public static toDomain(
-    productReservation: ProductReservationModel,
+    productReservation: ProductReservationModelExtended,
   ): ProductReservationDomain {
     const reservation_status = Object.values(ReservationStatus).find(
       (resevation_type) => resevation_type === productReservation.status,
@@ -25,6 +27,13 @@ export class ProductReservationMapper {
       status: ReservationStatus[reservation_status],
       created_at: productReservation.created_at,
       updated_at: productReservation.updated_at,
+      batch: new ProductBatchDomain({
+        id: productReservation.batch.id,
+        quantity: productReservation.batch.quantity,
+        expiration_date: productReservation.batch.expiration_date,
+        created_at: productReservation.batch.created_at,
+        updated_at: productReservation.batch.updated_at,
+      }),
     });
   }
 
@@ -47,6 +56,13 @@ export class ProductReservationMapper {
       status: reservation_status,
       created_at: productReservation.getCreatedAt(),
       updated_at: productReservation.getUpdatedAt(),
+      batch_id: productReservation.getBatch().getId(),
     };
   }
 }
+
+type ProductReservationModelExtended = Prisma.ProductReservationGetPayload<{
+  include: {
+    batch: true;
+  };
+}>;

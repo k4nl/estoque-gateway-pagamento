@@ -12,7 +12,11 @@ import { User } from '../user/user.domain';
 import { ProductBatch } from '../product-batch/product-batch.domain';
 import { ProductReservationManager } from '../product-reservation-manager/product-reservation-manager.domain';
 import { ProductReservation } from '../product-reservation/product-reservation.domain';
-import { ReserveProductCommand } from '../product-reservation-manager/input/product-reservation-manager.props';
+import {
+  CancelReservationProductManagerCommand,
+  ReleaseProductReservationManagerCommand,
+  ReserveProductReservationManagerCommand,
+} from '../product-reservation-manager/input/product-reservation-manager.props';
 
 export class Product {
   private id: Uuid;
@@ -178,12 +182,34 @@ export class Product {
     return batch;
   }
 
-  public reserve(command: ReserveProductCommand): ProductReservation {
+  public reserve(
+    command: Omit<ReserveProductReservationManagerCommand, 'product'>,
+  ): ProductReservation {
     return ProductReservationManager.reserve({
       product: this,
       quantity: command.quantity,
       batch: command.batch,
       reservation_id: command.reservation_id,
+    });
+  }
+
+  public cancelReservation(
+    command: Omit<CancelReservationProductManagerCommand, 'product'>,
+  ): ProductReservation {
+    return ProductReservationManager.cancel({
+      product: this,
+      product_reservation: command.product_reservation,
+      batch: command.batch,
+    });
+  }
+
+  public releaseReservation(
+    command: Omit<ReleaseProductReservationManagerCommand, 'product'>,
+  ): ProductReservation {
+    return ProductReservationManager.release({
+      product: this,
+      product_reservation: command.product_reservation,
+      batch: command.batch,
     });
   }
 }

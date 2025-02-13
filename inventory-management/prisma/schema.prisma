@@ -90,6 +90,7 @@ model ProductBatch {
   updated_at DateTime
 
   product Product @relation(fields: [product_id], references: [id])
+  reservations ProductReservation[]
 
   @@index([product_id])
   @@index([quantity])
@@ -105,6 +106,7 @@ model ProductBatch {
 model ProductReservation {
   id String @id
   product_id String
+  batch_id String
   external_id String @unique
   quantity Decimal @db.Decimal(10, 2)
   status ReservationStatus
@@ -112,9 +114,11 @@ model ProductReservation {
   updated_at DateTime
 
   product Product @relation(fields: [product_id], references: [id])
+  batch ProductBatch @relation(fields: [batch_id], references: [id])
 
   @@index([product_id])
   @@index([external_id])
+  @@index([batch_id])
   @@index([created_at])
   @@index([status])
   @@index([product_id, external_id])

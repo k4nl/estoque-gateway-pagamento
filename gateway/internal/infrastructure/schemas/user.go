@@ -21,6 +21,9 @@ type User struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
-	// Relacionamento 1 para 1
-	UserAuth *UserAuth `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
+	// Relacionamento do usuario com o plano dele
+	PlanID       uuid.UUID     `gorm:"type:uuid;not null"`
+	Plan         Plan          `gorm:"foreignKey:PlanID"`
+	PlanUsage    *PlanUsage    `gorm:"foreignKey:UserID"`
+	Transactions []Transaction `gorm:"foreignKey:ClientID"`
 }

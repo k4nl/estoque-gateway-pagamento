@@ -25,7 +25,7 @@ func Encrypt(value string) (*Password, error) {
 
 }
 
-func Compare(password Password, value string) (*Password, error) {
+func ComparePassword(password *Password, value string) (*Password, error) {
 
 	err := bcrypt.CompareHashAndPassword([]byte(password.value), []byte(value))
 
@@ -33,10 +33,10 @@ func Compare(password Password, value string) (*Password, error) {
 		return nil, err
 	}
 
-	return &password, nil
+	return password, nil
 }
 
-func Validate(value string) (*Password, error) {
+func ValidatePassword(value string) (*Password, error) {
 
 	value = strings.TrimSpace(value)
 
@@ -49,7 +49,7 @@ func Validate(value string) (*Password, error) {
 
 func NewPassword(value string) (*Password, error) {
 
-	if _, err := Validate(value); err != nil {
+	if _, err := ValidatePassword(value); err != nil {
 		return nil, err
 	}
 

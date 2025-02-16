@@ -2,6 +2,9 @@ package user
 
 import (
 	"errors"
+	"fmt"
+	userdto "gateway/internal/application/user/dto"
+	value_object "gateway/package/value-object"
 	"time"
 
 	"github.com/google/uuid"
@@ -14,8 +17,8 @@ type User struct {
 	Password  string    `json:"password"`
 	Role      Role      `json:"role"`
 	IsBlocked bool      `json:"is_blocked"`
-	CreatedAt string    `json:"created_at"`
-	UpdatedAt string    `json:"updated_at"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type Role string
@@ -32,12 +35,31 @@ func (u *User) Block() error {
 	}
 
 	u.IsBlocked = true
-	u.UpdatedAt = time.Now().Format(time.RFC3339)
+	u.UpdatedAt = time.Now()
 
 	return nil
 }
 
 func (u *User) Unblock() error {
 	u.IsBlocked = false
+	u.UpdatedAt = time.Now()
 	return nil
+}
+
+func (u *User) ChangePassword(changeUserPassword userdto.ChangeUserPasswordDTO) error {
+
+	newPassword, err := value_object.NewPassword(changeUserPassword.NewPassword)
+
+	if err != nil {
+		return err
+	}
+
+	if _, err := value_object.ComparePassword(newPassword, u.Password); err != nil {
+		return fmt.Errorf("invalid previous password")
+	}
+
+	u.Password = newPassword.String()
+
+	return nil
+
 }

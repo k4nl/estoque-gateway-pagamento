@@ -25,8 +25,8 @@ func NewAdmin(userName, userDocument string) (*Admin, error) {
 			Document:  userDocument,
 			Role:      AdminRole,
 			IsBlocked: false,
-			CreatedAt: time.Now().Format(time.RFC3339),
-			UpdatedAt: time.Now().Format(time.RFC3339),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
 		},
 	}, nil
 }

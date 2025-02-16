@@ -1,6 +1,7 @@
 package user
 
 import (
+	"gateway/internal/domain/application/plan"
 	value_object "gateway/package/value-object"
 	"time"
 
@@ -9,18 +10,11 @@ import (
 
 type Client struct {
 	User
-	Plan Plan `json:"plan"`
+	Plan      plan.Plan      `json:"plan"`
+	PlanUsage plan.PlanUsage `json:"plan_usage"`
 }
 
-type Plan string
-
-const (
-	Free    Plan = "free"
-	Basic   Plan = "basic"
-	Premium Plan = "premium"
-)
-
-func NewClient(userName string, userDocument string, userPassword string) (*Client, error) {
+func NewClient(userName string, userDocument string, userPassword string, plan *plan.Plan) (*Client, error) {
 
 	if _, err := value_object.ValidadeName(userName); err != nil {
 		return nil, err
@@ -43,10 +37,26 @@ func NewClient(userName string, userDocument string, userPassword string) (*Clie
 			Role:      ClientRole,
 			IsBlocked: false,
 			Password:  pwd.String(),
-			CreatedAt: time.Now().Format(time.RFC3339),
-			UpdatedAt: time.Now().Format(time.RFC3339),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
 		},
-		Plan: Free,
+		Plan: *plan,
+	}, nil
+
+}
+
+func (c *Client) UpgradePlan(planUsageData plan.PlanUsage) (*Client, error) {
+
+	return &Client{
+		Plan: planUsageData.UserPlanUsage,
+		PlanUsage: plan.PlanUsage{
+			ID:                      planUsageData.ID,
+			UserPlanUsage:           planUsageData.UserPlanUsage,
+			IsAvailable:             true,
+			ProductsLimitUsed:       0,
+			CategoriesLimitUsed:     0,
+			RequestsPerDayLimitUsed: 0,
+		},
 	}, nil
 
 }

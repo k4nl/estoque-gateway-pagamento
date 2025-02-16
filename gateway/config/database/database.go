@@ -42,10 +42,16 @@ func InitDatabase() error {
 	CreateDatabaseEnums(db)
 
 	// Migrate the schema
-	if err := db.AutoMigrate(&schemas.User{}, &schemas.UserAuth{}); err != nil {
+	if err := db.AutoMigrate(
+		&schemas.User{},
+		&schemas.Plan{},
+		&schemas.PlanUsage{},
+	); err != nil {
 		log.Fatalln("Error migrating database: ", err)
 		return err
 	}
+
+	SeedPlan(db)
 
 	return nil
 }

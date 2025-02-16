@@ -6,6 +6,7 @@ import {
   ProductReservationProps,
 } from './input/product-reservation.props';
 import { ProductBatch } from '../product-batch/product-batch.domain';
+import { ExpirationHandler } from 'src/@core/utils/expiration-handler';
 
 export class ProductReservation {
   private id: Uuid;
@@ -14,6 +15,7 @@ export class ProductReservation {
   private batch: ProductBatch;
   private quantity: Decimal;
   private status: ReservationStatus;
+  private expires_at: Date;
   private created_at: Date;
   private updated_at: Date;
 
@@ -32,6 +34,7 @@ export class ProductReservation {
     this.created_at = props.created_at;
     this.updated_at = props.updated_at;
     this.batch = props.batch;
+    this.expires_at = props.expires_at;
   }
 
   public static create(command: CreateProductReservationCommand) {
@@ -44,6 +47,9 @@ export class ProductReservation {
       created_at: new Date(),
       updated_at: new Date(),
       batch: command.batch,
+      expires_at: ExpirationHandler.calculateExpirationDate(
+        command.expires_at || 5,
+      ),
     });
   }
 
@@ -79,6 +85,14 @@ export class ProductReservation {
 
   public getBatch(): ProductBatch {
     return this.batch;
+  }
+
+  public isExpired(): boolean {
+    return ExpirationHandler.isExpired(this.expires_at);
+  }
+
+  public getExpiresAt(): Date {
+    return this.expires_at;
   }
 
   // Setters

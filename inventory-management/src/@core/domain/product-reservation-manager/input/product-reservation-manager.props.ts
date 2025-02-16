@@ -8,6 +8,7 @@ export type ReserveProductReservationManagerCommand = {
   reservation_id: string;
   quantity: Decimal;
   batch: ProductBatch;
+  minutes_to_expire?: number;
 };
 
 export type CancelReservationProductManagerCommand = {
@@ -17,6 +18,12 @@ export type CancelReservationProductManagerCommand = {
 };
 
 export type ReleaseProductReservationManagerCommand = {
+  product_reservation: ProductReservation;
+  product: Product;
+  batch: ProductBatch;
+};
+
+export type ExpireReservationProductManagerCommand = {
   product_reservation: ProductReservation;
   product: Product;
   batch: ProductBatch;

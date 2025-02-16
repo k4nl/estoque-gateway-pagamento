@@ -5,6 +5,9 @@ import { ProductReservationRepository } from 'src/application/product-reservatio
 import { ReserveProductRepository } from '../../product-reservation/repositories/reserve-product.repository';
 import { GetProductService } from 'src/application/product/services';
 import { ProductReservationDTO } from '../dto/product-reservation.dto';
+import { PublisherManager } from 'src/config/events/transporter';
+import { ReservationEventsEnum } from '../events/events.enum';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class ReserveProductService {
@@ -12,6 +15,8 @@ export class ReserveProductService {
     private readonly getProductService: GetProductService,
     private readonly productReservationRepository: ProductReservationRepository,
     private readonly reserveProductRepository: ReserveProductRepository,
+    private readonly publisherManager: PublisherManager,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async execute(
@@ -38,6 +43,7 @@ export class ReserveProductService {
       batch: productBatch,
       quantity: new Decimal(reserveProductDTO.quantity),
       reservation_id: reserveProductDTO.reservation_id,
+      minutes_to_expire: reserveProductDTO.minutes_to_expire,
     });
 
     await this.reserveProductRepository.saveReservation(
@@ -45,8 +51,15 @@ export class ReserveProductService {
       productBatch,
     );
 
+    this.eventEmitter.emit(ReservationEventsEnum.RESERVED, product_reservation);
+
     return {
       message: `Product ${product.getName()} reserved successfully`,
+      data: {
+        reservation_id: reserveProductDTO.reservation_id,
+        expires_at: product_reservation.getExpiresAt(),
+        status: product_reservation.getStatus(),
+      },
     };
   }
 }

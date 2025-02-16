@@ -2,6 +2,7 @@ import { ProductReservation } from '../product-reservation/product-reservation.d
 import { ReservationStatus } from 'src/@core/common/enum';
 import {
   CancelReservationProductManagerCommand,
+  ExpireReservationProductManagerCommand,
   ReleaseProductReservationManagerCommand,
   ReserveProductReservationManagerCommand,
 } from './input/product-reservation-manager.props';
@@ -33,6 +34,7 @@ export class ProductReservationManager {
       quantity,
       status: ReservationStatus.RESERVED,
       batch,
+      expires_at: command.minutes_to_expire,
     });
 
     batch.decrementQuantity(quantity);
@@ -91,6 +93,31 @@ export class ProductReservationManager {
       reservation_id: product_reservation.getReservationId(),
       status: ReservationStatus.CANCELED,
       updated_at: new Date(),
+      expires_at: product_reservation.getExpiresAt(),
+    });
+  }
+
+  public static expire(
+    command: ExpireReservationProductManagerCommand,
+  ): ProductReservation {
+    const { product, product_reservation, batch } = command;
+
+    this.validateProductReservation(product_reservation);
+
+    this.validateProductAndBatch(product, batch);
+
+    batch.incrementQuantity(product_reservation.getQuantity());
+
+    return new ProductReservation({
+      batch,
+      created_at: product_reservation.getCreatedAt(),
+      id: product_reservation.getId(),
+      product_id: product_reservation.getProductId(),
+      quantity: product_reservation.getQuantity(),
+      reservation_id: product_reservation.getReservationId(),
+      status: ReservationStatus.EXPIRED,
+      updated_at: new Date(),
+      expires_at: product_reservation.getExpiresAt(),
     });
   }
 
@@ -100,6 +127,10 @@ export class ProductReservationManager {
     const { product, product_reservation, batch } = command;
 
     this.validateProductReservation(product_reservation);
+
+    if (product_reservation.isExpired()) {
+      throw new Error('Product reservation expired');
+    }
 
     this.validateProductAndBatch(product, batch);
 
@@ -112,6 +143,7 @@ export class ProductReservationManager {
       reservation_id: product_reservation.getReservationId(),
       status: ReservationStatus.RELEASED,
       updated_at: new Date(),
+      expires_at: product_reservation.getExpiresAt(),
     });
   }
 }

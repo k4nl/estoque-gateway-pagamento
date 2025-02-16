@@ -27,6 +27,7 @@ export class ProductReservationMapper {
       status: ReservationStatus[reservation_status],
       created_at: productReservation.created_at,
       updated_at: productReservation.updated_at,
+      expires_at: productReservation.expires_at,
       batch: new ProductBatchDomain({
         id: productReservation.batch.id,
         quantity: productReservation.batch.quantity,
@@ -57,6 +58,7 @@ export class ProductReservationMapper {
       created_at: productReservation.getCreatedAt(),
       updated_at: productReservation.getUpdatedAt(),
       batch_id: productReservation.getBatch().getId(),
+      expires_at: productReservation.getExpiresAt(),
     };
   }
 }

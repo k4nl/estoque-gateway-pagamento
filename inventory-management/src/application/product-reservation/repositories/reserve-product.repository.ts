@@ -56,6 +56,44 @@ export class ReserveProductRepository {
     });
   }
 
+  async expireReservation(
+    productReservation: ProductReservation,
+    productBatch: ProductBatch,
+  ) {
+    await this.database.$transaction(async (db) => {
+      await db.productReservation.update({
+        where: {
+          id: productReservation.getId(),
+        },
+        data: {
+          status: productReservation.getStatus(),
+        },
+      });
+
+      await db.inventory.update({
+        where: {
+          product_id: productReservation.getProductId(),
+        },
+        data: {
+          quantity: {
+            increment: productReservation.getQuantity(),
+          },
+        },
+      });
+
+      await db.productBatch.update({
+        where: {
+          id: productBatch.getId(),
+        },
+        data: {
+          quantity: {
+            increment: productReservation.getQuantity(),
+          },
+        },
+      });
+    });
+  }
+
   async cancelReservation(
     productReservation: ProductReservation,
     productBatch: ProductBatch,

@@ -5,15 +5,24 @@ import { APP_GUARD } from '@nestjs/core';
 import { CategoryModule } from './application/category/category.module';
 import { AuthModule } from './@core/application/auth/auth.module';
 import { JwtAuthGuard } from './@core/application/auth/guards/jwt.guard';
+import { TransporterModule } from './config/events/transporter.module';
 import {
   MockRolesGuard,
   RolesGuard,
 } from './@core/application/auth/guards/role.guard';
+import { RedisModule } from './config/redis/redis.module';
 
 const is_production = process.env.NODE_ENV === 'production';
 
 @Module({
-  imports: [DatabaseModule, AuthModule, UserModule, CategoryModule],
+  imports: [
+    DatabaseModule,
+    TransporterModule,
+    RedisModule,
+    AuthModule,
+    UserModule,
+    CategoryModule,
+  ],
   controllers: [],
   providers: [
     {

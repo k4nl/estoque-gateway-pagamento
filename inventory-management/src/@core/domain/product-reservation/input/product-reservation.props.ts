@@ -10,6 +10,7 @@ export type ProductReservationProps = {
   quantity: Decimal;
   status: ReservationStatus;
   batch: ProductBatch;
+  expires_at: Date;
   created_at: Date;
   updated_at: Date;
 };
@@ -20,4 +21,5 @@ export type CreateProductReservationCommand = {
   product_id: Uuid | string;
   quantity: Decimal;
   status: ReservationStatus;
+  expires_at?: number;
 };

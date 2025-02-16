@@ -14,6 +14,7 @@ import { ProductReservationManager } from '../product-reservation-manager/produc
 import { ProductReservation } from '../product-reservation/product-reservation.domain';
 import {
   CancelReservationProductManagerCommand,
+  ExpireReservationProductManagerCommand,
   ReleaseProductReservationManagerCommand,
   ReserveProductReservationManagerCommand,
 } from '../product-reservation-manager/input/product-reservation-manager.props';
@@ -190,6 +191,7 @@ export class Product {
       quantity: command.quantity,
       batch: command.batch,
       reservation_id: command.reservation_id,
+      minutes_to_expire: command.minutes_to_expire,
     });
   }
 
@@ -207,6 +209,16 @@ export class Product {
     command: Omit<ReleaseProductReservationManagerCommand, 'product'>,
   ): ProductReservation {
     return ProductReservationManager.release({
+      product: this,
+      product_reservation: command.product_reservation,
+      batch: command.batch,
+    });
+  }
+
+  public expireReservation(
+    command: Omit<ExpireReservationProductManagerCommand, 'product'>,
+  ): ProductReservation {
+    return ProductReservationManager.expire({
       product: this,
       product_reservation: command.product_reservation,
       batch: command.batch,

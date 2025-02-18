@@ -8,6 +8,9 @@ export class ProductReservationDTO {
   @IsUuid()
   batch_id: string;
 
+  @IsUuid()
+  product_id: string;
+
   @IsNumber({
     allowInfinity: false,
     allowNaN: false,

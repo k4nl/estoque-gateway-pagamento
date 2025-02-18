@@ -65,4 +65,14 @@ export class ProductBatch {
   public incrementQuantity(quantity: Decimal) {
     this.quantity = this.quantity.plus(quantity);
   }
+
+  public isExpired(): boolean {
+    if (!this.expiration_date) {
+      return false;
+    }
+
+    const now = new Date();
+
+    return now > this.expiration_date;
+  }
 }

@@ -18,7 +18,9 @@ export class InventoryMapper {
   public toDomain(inventory: InventoryModelExtended): InventoryDomain {
     return new InventoryDomain({
       id: inventory.id,
-      product: ProductMapper.toDomain(inventory.product),
+      product: ProductMapper.toDomain({
+        categories: inventory.product.categories,
+      }),
       alert_on_low_stock: inventory.alert_on_low_stock,
       quantity: inventory.quantity,
       minimum_stock: inventory.minimum_stock,
@@ -36,6 +38,7 @@ type InventoryModelExtended = Prisma.InventoryGetPayload<{
         pyhsical_product: true;
         categories: true;
         product_batches: true;
+        user: true;
       };
     };
   };

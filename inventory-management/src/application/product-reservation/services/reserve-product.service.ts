@@ -19,12 +19,11 @@ export class ReserveProductService {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  async execute(
-    reserveProductDTO: ProductReservationDTO,
-    product_id: string,
-    user: User,
-  ) {
-    const product = await this.getProductService.execute(product_id, user);
+  async execute(reserveProductDTO: ProductReservationDTO, user: User) {
+    const product = await this.getProductService.execute(
+      reserveProductDTO.product_id,
+      user,
+    );
 
     const is_reserverd =
       await this.productReservationRepository.findReservationByExternalIdId(

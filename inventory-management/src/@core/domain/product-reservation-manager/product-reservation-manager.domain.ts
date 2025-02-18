@@ -28,6 +28,10 @@ export class ProductReservationManager {
       throw new Error('Not enough quantity to reserve');
     }
 
+    if (batch.isExpired()) {
+      throw new Error('Batch expired');
+    }
+
     const reservation = ProductReservation.create({
       reservation_id,
       product_id: product.getId(),

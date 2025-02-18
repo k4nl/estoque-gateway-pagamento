@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { $Enums } from '@prisma/client';
-import { Decimal } from '@prisma/client/runtime/library';
 import { ReservationStatus } from 'src/@core/common/enum';
 import { ProductReservation } from 'src/@core/domain/product-reservation/product-reservation.domain';
 import { ProductReservationMapper } from 'src/@core/infra/mappers/product-reservation.mapper';
@@ -13,10 +12,16 @@ export class ProductReservationRepository {
 
   async findReservationByExternalIdId(
     external_id: string,
+    user_id?: string,
   ): Promise<ProductReservation | null> {
     const reservation = await this.database.productReservation.findUnique({
       where: {
         external_id,
+        product: user_id
+          ? {
+              user_id,
+            }
+          : undefined,
       },
       include: { batch: true },
     });

@@ -11,12 +11,14 @@ import {
   RolesGuard,
 } from './@core/application/auth/guards/role.guard';
 import { RedisModule } from './config/redis/redis.module';
+import { TriggersModule } from './config/database/triggers/triggers.module';
 
 const is_production = process.env.NODE_ENV === 'production';
 
 @Module({
   imports: [
     DatabaseModule,
+    TriggersModule,
     TransporterModule,
     RedisModule,
     AuthModule,

@@ -3,7 +3,7 @@ import { Inventory as InventoryDomain } from 'src/@core/domain/inventory/invento
 import { ProductMapper } from './product.mapper';
 
 export class InventoryMapper {
-  public toDatabase(inventory: InventoryDomain): InventoryModel {
+  public static toDatabase(inventory: InventoryDomain): InventoryModel {
     return {
       id: inventory.getId(),
       product_id: inventory.getProduct().getId(),
@@ -15,12 +15,26 @@ export class InventoryMapper {
     };
   }
 
-  public toDomain(inventory: InventoryModelExtended): InventoryDomain {
+  public static toDomain(inventory: InventoryModelExtended): InventoryDomain {
+    const product = ProductMapper.toDomain({
+      categories: inventory.product.categories,
+      created_at: inventory.product.created_at,
+      description: inventory.product.description,
+      id: inventory.product.id,
+      digital_product: inventory.product.digital_product,
+      name: inventory.product.name,
+      inventory: inventory,
+      product_batches: inventory.product.product_batches,
+      physical_product: inventory.product.physical_product,
+      reservation_type: inventory.product.reservation_type,
+      updated_at: inventory.product.updated_at,
+      user: inventory.product.user,
+      user_id: inventory.product.user_id,
+    });
+
     return new InventoryDomain({
       id: inventory.id,
-      product: ProductMapper.toDomain({
-        categories: inventory.product.categories,
-      }),
+      product,
       alert_on_low_stock: inventory.alert_on_low_stock,
       quantity: inventory.quantity,
       minimum_stock: inventory.minimum_stock,
@@ -35,7 +49,7 @@ type InventoryModelExtended = Prisma.InventoryGetPayload<{
     product: {
       include: {
         digital_product: true;
-        pyhsical_product: true;
+        physical_product: true;
         categories: true;
         product_batches: true;
         user: true;

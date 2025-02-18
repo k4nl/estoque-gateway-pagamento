@@ -18,3 +18,8 @@ export type CreateInventoryCommand = {
   minimum_stock?: Decimal;
   alert_on_low_stock: boolean;
 };
+
+export type UpdateInventoryCommand = {
+  minimum_stock?: number;
+  alert_on_low_stock?: boolean;
+};

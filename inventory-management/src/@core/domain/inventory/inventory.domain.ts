@@ -4,6 +4,7 @@ import { Decimal } from '@prisma/client/runtime/library';
 import {
   CreateInventoryCommand,
   InventoryProps,
+  UpdateInventoryCommand,
 } from './input/inventory-props';
 
 export class Inventory {
@@ -65,5 +66,17 @@ export class Inventory {
 
   public getUpdatedAt(): Date {
     return this.updated_at;
+  }
+
+  public update(command: UpdateInventoryCommand): void {
+    if (command.minimum_stock !== undefined) {
+      this.minimum_stock = new Decimal(command.minimum_stock);
+    }
+
+    if (command.alert_on_low_stock !== undefined) {
+      this.alert_on_low_stock = command.alert_on_low_stock;
+    }
+
+    this.updated_at = new Date();
   }
 }

@@ -14,37 +14,38 @@ datasource db {
 }
 
 model User {
-  id        String   @id
-  external_id String @unique @db.Bit(64)
+  id          String   @id
+  external_id String   @unique @db.Uuid
   user_type   UserType
-  created_at DateTime
-  updated_at DateTime
+  created_at  DateTime
+  updated_at  DateTime
 
   categories Category[]
-  products Product[]
+  products   Product[]
 
   @@index([external_id])
   @@index([user_type])
 }
 
 model Product {
-  id       String   @id
-  name     String  @db.VarChar(100)
-  description String @db.VarChar(255)
+  id               String          @id
+  name             String          @db.VarChar(100)
+  description      String          @db.VarChar(255)
   reservation_type ReservationType
-  user_id String
-  created_at DateTime
-  updated_at DateTime
+  user_id          String
+  created_at       DateTime
+  updated_at       DateTime
 
-  physical_product PhysicalProduct?
-  digital_product DigitalProduct?
-  inventory Inventory?
-  product_batches ProductBatch[]
-  categories Category[]
+  physical_product    PhysicalProduct?
+  digital_product     DigitalProduct?
+  inventory           Inventory?
+  product_batches     ProductBatch[]
+  categories          ProductCategory[]
   product_reservation ProductReservation[]
 
   user User @relation(fields: [user_id], references: [id])
 
+  @@unique([name, user_id])
   @@index([name, user_id])
   @@index([created_at, user_id])
   @@index([description, user_id])
@@ -53,17 +54,14 @@ model Product {
   @@index([name, reservation_type, user_id])
   @@index([name, created_at, user_id])
   @@index([name, reservation_type, created_at, user_id])
-  @@unique([name, user_id])
-  
 }
 
 model PhysicalProduct {
-  product_id String @id
+  product_id      String    @id
   expiration_date DateTime?
-  perishable Boolean
+  perishable      Boolean
 
   product Product @relation(fields: [product_id], references: [id])
-  
 
   @@index([expiration_date])
   @@index([perishable])
@@ -72,24 +70,23 @@ model PhysicalProduct {
 
 model DigitalProduct {
   product_id String @id
-  url String
+  url        String
 
   product Product @relation(fields: [product_id], references: [id])
-  
-  @@index([url])
 
   @@unique([url, product_id])
+  @@index([url])
 }
 
 model ProductBatch {
-  id String @id
-  product_id String
-  quantity Decimal @db.Decimal(10, 2)
+  id              String    @id
+  product_id      String
+  quantity        Decimal   @db.Decimal(10, 2)
   expiration_date DateTime?
-  created_at DateTime
-  updated_at DateTime
+  created_at      DateTime
+  updated_at      DateTime
 
-  product Product @relation(fields: [product_id], references: [id])
+  product      Product              @relation(fields: [product_id], references: [id])
   reservations ProductReservation[]
 
   @@index([product_id])
@@ -100,22 +97,21 @@ model ProductBatch {
   @@index([product_id, expiration_date])
   @@index([product_id, created_at])
   @@index([product_id, quantity, expiration_date])
-
 }
 
 model ProductReservation {
-  id String @id
-  product_id String
-  batch_id String
-  external_id String @unique
-  quantity Decimal @db.Decimal(10, 2)
-  status ReservationStatus
-  expires_at DateTime
-  created_at DateTime
-  updated_at DateTime
+  id          String            @id
+  product_id  String
+  batch_id    String
+  external_id String            @unique
+  quantity    Decimal           @db.Decimal(10, 2)
+  status      ReservationStatus
+  expires_at  DateTime
+  created_at  DateTime
+  updated_at  DateTime
 
-  product Product @relation(fields: [product_id], references: [id])
-  batch ProductBatch @relation(fields: [batch_id], references: [id])
+  product Product      @relation(fields: [product_id], references: [id])
+  batch   ProductBatch @relation(fields: [batch_id], references: [id])
 
   @@index([product_id])
   @@index([external_id])
@@ -127,35 +123,47 @@ model ProductReservation {
   @@index([product_id, created_at])
   @@index([product_id, external_id, created_at, status])
   @@index([product_id, created_at, status])
-  
 }
 
 model Category {
-  id String @id
-  name String @db.VarChar(100)
-  responsible_id String 
-  created_at DateTime
-  updated_at DateTime
+  id             String   @id
+  name           String   @db.VarChar(100)
+  responsible_id String?
+  created_at     DateTime
+  updated_at     DateTime
 
-  responsible User @relation(fields: [responsible_id], references: [id])
-  products Product[]
+  responsible         User?             @relation(fields: [responsible_id], references: [id])
+  products_categories ProductCategory[]
 
+  @@unique([name, responsible_id])
   @@index([name])
   @@index([created_at])
   @@index([responsible_id])
   @@index([name, responsible_id])
   @@index([name, created_at])
+}
 
-  @@unique([name, responsible_id])
+model ProductCategory {
+  id          String @id
+  product_id  String
+  category_id String
+
+  product  Product  @relation(fields: [product_id], references: [id])
+  category Category @relation(fields: [category_id], references: [id])
+
+  @@unique([product_id, category_id])
+  @@index([product_id])
+  @@index([category_id])
+  @@index([product_id, category_id])
 }
 
 model Inventory {
-  id String @id
-  product_id String @unique
-  quantity Decimal @db.Decimal(10, 2)
-  created_at DateTime
-  updated_at DateTime
-  minimum_stock Decimal? @db.Decimal(10, 2)
+  id                 String   @id
+  product_id         String   @unique
+  quantity           Decimal  @db.Decimal(10, 2)
+  created_at         DateTime
+  updated_at         DateTime
+  minimum_stock      Decimal? @db.Decimal(10, 2)
   alert_on_low_stock Boolean
 
   product Product @relation(fields: [product_id], references: [id])
@@ -170,9 +178,7 @@ model Inventory {
   @@index([product_id, alert_on_low_stock])
   @@index([product_id, created_at])
   @@index([product_id, quantity, minimum_stock])
-
 }
-
 
 enum ReservationStatus {
   released
@@ -180,7 +186,6 @@ enum ReservationStatus {
   canceled
   expired
 }
-
 
 enum ReservationType {
   reservable

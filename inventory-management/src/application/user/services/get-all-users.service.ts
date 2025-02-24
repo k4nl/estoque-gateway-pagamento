@@ -24,7 +24,7 @@ export class GetAllUsersService {
 
     return {
       users,
-      pagination,
+      ...pagination,
     };
   }
 }

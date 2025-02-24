@@ -98,7 +98,11 @@ export class InventoryRepository {
           include: {
             digital_product: true,
             physical_product: true,
-            categories: true,
+            categories: {
+              include: {
+                category: true,
+              },
+            },
             product_batches: true,
             user: true,
           },

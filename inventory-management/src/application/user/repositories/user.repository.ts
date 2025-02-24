@@ -33,20 +33,29 @@ export class UserRepository {
     return { users: users.map(UserMapper.toDomain), total };
   }
 
-  async getByExternalId(externalId: string, user_props: User) {
+  async getByExternalId(externalId: string) {
     const user = await this.database.user.findUnique({
       where: {
         external_id: externalId,
       },
     });
 
-    if (
-      user_props.getUserType() !== UserType.admin &&
-      user_props.getId() !== user.id
-    ) {
-      throw new Error('Unauthorized');
+    if (!user) {
+      return null;
     }
 
     return UserMapper.toDomain(user);
+  }
+
+  async create(user: User) {
+    await this.database.user.create({
+      data: {
+        external_id: user.getExternalId(),
+        created_at: user.getCreatedAt(),
+        id: user.getId(),
+        updated_at: user.getUpdatedAt(),
+        user_type: user.getUserType(),
+      },
+    });
   }
 }

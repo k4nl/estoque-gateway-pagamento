@@ -1,18 +1,15 @@
-import { Prisma } from '@prisma/client';
 import { DatabaseTrigger } from './trigger.enum';
 
 export class InventoryTrigger {
   static getLowStockTriggerSQL() {
-    const triggerName = Prisma.sql`${DatabaseTrigger.low_stock}`;
-
-    return Prisma.sql`
+    return `
       CREATE OR REPLACE FUNCTION notify_low_stock() RETURNS TRIGGER AS $$
       DECLARE 
         payload TEXT;
       BEGIN
         IF NEW.alert_on_low_stock = TRUE AND NEW.quantity <= COALESCE(NEW.minimum_stock, 0) THEN
           payload := json_build_object(
-            'type', ${triggerName},  -- Tipo da notificação
+            'type', '${DatabaseTrigger.low_stock}',  -- Tipo da notificação
             'id', NEW.id,
             'product_id', NEW.product_id,
             'quantity', NEW.quantity,
@@ -27,10 +24,10 @@ export class InventoryTrigger {
       END;
       $$ LANGUAGE plpgsql;
 
-      DROP TRIGGER IF EXISTS ${DatabaseTrigger.low_stock} ON inventory;
+      DROP TRIGGER IF EXISTS ${DatabaseTrigger.low_stock} ON "Inventory";
 
       CREATE TRIGGER ${DatabaseTrigger.low_stock}
-      AFTER UPDATE ON inventory
+      AFTER UPDATE ON "Inventory"
       FOR EACH ROW
       WHEN (NEW.quantity <= COALESCE(NEW.minimum_stock, 0) AND NEW.alert_on_low_stock = TRUE)
       EXECUTE FUNCTION notify_low_stock();

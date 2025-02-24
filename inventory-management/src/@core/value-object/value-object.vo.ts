@@ -40,6 +40,8 @@ export abstract class ValueObject<Value = any> {
       ? JSON.stringify(this.value)
       : valueStr;
   };
+
+  toJSON = () => this.value;
 }
 
 export function deepFreeze<T>(obj: T) {

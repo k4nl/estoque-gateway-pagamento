@@ -9,7 +9,13 @@ type PaginationResponse = {
 };
 
 export class Pagination {
-  private metadata: PaginationResponse;
+  private metadata: PaginationResponse = {
+    page: 1,
+    limit: 10,
+    total: 0,
+    nextPage: null,
+    previousPage: null,
+  };
 
   constructor(props: PaginationProps) {
     this.metadata.page = props.page || 1;

@@ -1,19 +1,19 @@
 import { Module } from '@nestjs/common';
 import { UserModule } from './application/user/user.module';
 import { DatabaseModule } from './config/database/database.module';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { CategoryModule } from './application/category/category.module';
-import { AuthModule } from './@core/application/auth/auth.module';
-import { JwtAuthGuard } from './@core/application/auth/guards/jwt.guard';
 import { TransporterModule } from './config/events/transporter.module';
-import {
-  MockRolesGuard,
-  RolesGuard,
-} from './@core/application/auth/guards/role.guard';
+
 import { RedisModule } from './config/redis/redis.module';
 import { TriggersModule } from './config/database/triggers/triggers.module';
-
-const is_production = process.env.NODE_ENV === 'production';
+import { InventoryModule } from './application/inventory/inventory.module';
+import { ProductModule } from './application/product/product.module';
+import { ProductReservationModule } from './application/product-reservation/product-reservation.module';
+import { AuthModule } from './application/common/auth/auth.module';
+import { JwtAuthGuard } from './application/common/auth/guards/jwt.guard';
+import { RolesGuard } from './application/common/auth/guards/role.guard';
+import { ErrorFilter } from './@core/application/errors/error-filter';
 
 @Module({
   imports: [
@@ -24,6 +24,9 @@ const is_production = process.env.NODE_ENV === 'production';
     AuthModule,
     UserModule,
     CategoryModule,
+    InventoryModule,
+    ProductModule,
+    ProductReservationModule,
   ],
   controllers: [],
   providers: [
@@ -33,7 +36,11 @@ const is_production = process.env.NODE_ENV === 'production';
     },
     {
       provide: APP_GUARD,
-      useClass: is_production ? RolesGuard : MockRolesGuard,
+      useClass: RolesGuard,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: ErrorFilter,
     },
   ],
 })

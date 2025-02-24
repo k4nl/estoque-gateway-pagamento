@@ -8,6 +8,7 @@ export class CategoryMapper {
       id: category.id,
       name: category.name,
       updated_at: category.updated_at,
+      responsible_id: category.responsible_id || null,
     });
   }
 

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CategoryRepository } from '../repositories/category.repository';
 import { CreateCategoryDTO } from '../dto/create-category.dto';
 import { ResponseDTO } from 'src/application/common/dto/response.dto';
@@ -28,7 +28,9 @@ export class CreateCategoryService {
     );
 
     if (categoryExists) {
-      throw new Error(`Category ${category.getName()} already exists`);
+      throw new ConflictException(
+        `Category ${category.getName()} already exists`,
+      );
     }
 
     await this.categoryRepository.create(category);

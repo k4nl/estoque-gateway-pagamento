@@ -34,22 +34,27 @@ export class CategoryRepository {
       category_name.in = filter.name;
     }
 
-    const [categories, total] = await Promise.all([
-      this.database.category.findMany({
-        where: {
-          name: category_name,
-          created_at: filter.created_at,
+    const where = {
+      name: category_name,
+      created_at: filter.created_at,
+      OR: [
+        {
           responsible_id: filter.responsible_id,
         },
+        {
+          responsible_id: null,
+        },
+      ],
+    };
+
+    const [categories, total] = await Promise.all([
+      this.database.category.findMany({
+        where,
         skip: filter.offset,
         take: filter.limit,
       }),
       this.database.category.count({
-        where: {
-          name: category_name,
-          created_at: filter.created_at,
-          responsible_id: filter.responsible_id,
-        },
+        where,
       }),
     ]);
 

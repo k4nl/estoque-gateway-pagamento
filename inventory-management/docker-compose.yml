@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  inventorydb:
+    image: postgres:13
+    container_name: inventorydb
+    env_file:
+      - .env
+    volumes:
+      - inventorydb:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - '6379:6379'
+    environment:
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+
+volumes:
+  inventorydb:

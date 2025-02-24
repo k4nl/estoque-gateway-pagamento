@@ -50,7 +50,11 @@ type InventoryModelExtended = Prisma.InventoryGetPayload<{
       include: {
         digital_product: true;
         physical_product: true;
-        categories: true;
+        categories: {
+          select: {
+            category: true;
+          };
+        };
         product_batches: true;
         user: true;
       };

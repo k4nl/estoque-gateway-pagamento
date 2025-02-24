@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CategoryRepository } from '../repositories/category.repository';
 import { User } from 'src/@core/domain/user/user.domain';
 import { UserType } from '@prisma/client';
@@ -13,11 +17,13 @@ export class DeleteCategoryService {
     const category = await this.categoryRepository.findById(category_id);
 
     if (!category) {
-      throw new Error('Category not found');
+      throw new NotFoundException('Category not found');
     }
 
     if (!is_admin && category.getResponsibleId() !== user.getId()) {
-      throw new Error('You do not have permission to delete this category');
+      throw new UnauthorizedException(
+        'You do not have permission to delete this category',
+      );
     }
 
     await this.categoryRepository.delete(category_id);

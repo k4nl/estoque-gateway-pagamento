@@ -23,7 +23,11 @@ export class ProductRepository {
         },
       },
       include: {
-        categories: true,
+        categories: {
+          include: {
+            category: true,
+          },
+        },
         digital_product: true,
         physical_product: true,
         product_batches: true,
@@ -43,7 +47,11 @@ export class ProductRepository {
     const product = await this.database.product.findUnique({
       where: { id },
       include: {
-        categories: true,
+        categories: {
+          include: {
+            category: true,
+          },
+        },
         digital_product: true,
         physical_product: true,
         product_batches: true,
@@ -174,7 +182,11 @@ export class ProductRepository {
       this.database.product.findMany({
         where,
         include: {
-          categories: true,
+          categories: {
+            include: {
+              category: true,
+            },
+          },
           digital_product: true,
           physical_product: true,
           product_batches: true,

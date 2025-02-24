@@ -5,8 +5,8 @@ import { UserType } from 'src/@core/common/user-type';
 export class UserMapper {
   public static toDatabase(user: UserDomain): UserModel {
     return {
-      id: user.getId().value,
-      external_id: user.getExternalId().value,
+      id: user.getId(),
+      external_id: user.getExternalId(),
       user_type: user.getUserType(),
       created_at: user.getCreatedAt(),
       updated_at: user.getUpdatedAt(),

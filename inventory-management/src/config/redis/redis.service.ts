@@ -18,8 +18,8 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
 
   constructor(private readonly eventEmitter: EventEmitter2) {
     this.redisClient = new Redis({
-      host: process.env.AWS_REDIS_HOST,
-      port: parseInt(process.env.AWS_REDIS_PORT),
+      host: process.env.REDIS_HOST,
+      port: Number(process.env.REDIS_PORT),
     });
 
     // Criando uma conexão separada para escutar eventos

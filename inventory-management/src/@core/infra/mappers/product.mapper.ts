@@ -54,7 +54,7 @@ export class ProductMapper {
     product: ProductModelExtended,
   ): PhysicalProductDomain {
     const categories = product.categories.map(
-      (category) => new Category(category),
+      ({ category }) => new Category(category),
     );
 
     const batches = product.product_batches.map(
@@ -111,7 +111,7 @@ export class ProductMapper {
     product: ProductModelExtended,
   ): DigitalProductDomain {
     const categories = product.categories.map(
-      (category) => new Category(category),
+      ({ category }) => new Category(category),
     );
 
     const batches = product.product_batches.map(
@@ -165,7 +165,7 @@ export class ProductMapper {
 
   private static toProduct(product: ProductModelExtended): ProductDomain {
     const categories = product.categories.map(
-      (category) => new Category(category),
+      ({ category }) => new Category(category),
     );
 
     const userType: string = Object.values($Enums.UserType).find(
@@ -380,7 +380,11 @@ type ProductModelExtended = Prisma.ProductGetPayload<{
         perishable: true;
       };
     };
-    categories: true;
+    categories: {
+      select: {
+        category: true;
+      };
+    };
     product_batches: {
       select: {
         id: true;

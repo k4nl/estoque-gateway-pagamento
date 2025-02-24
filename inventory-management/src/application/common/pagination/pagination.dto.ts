@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import { IsNumber, IsOptional } from 'class-validator';
 
 export class PaginationDTO {
@@ -15,6 +16,7 @@ export class PaginationDTO {
   page: number;
 
   @IsOptional()
+  @Transform(({ value }) => Number(value))
   @IsNumber(
     {
       allowInfinity: false,

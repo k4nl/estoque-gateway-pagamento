@@ -29,7 +29,7 @@ export class GetAllCategoriesService {
 
     return {
       categories,
-      pagination,
+      ...pagination,
     };
   }
 }

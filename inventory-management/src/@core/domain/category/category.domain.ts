@@ -54,4 +54,14 @@ export class Category {
   public getUpdatedAt(): Date {
     return this.updated_at;
   }
+
+  public toJSON() {
+    return {
+      id: this.getId(),
+      name: this.getName(),
+      responsible_id: this.getResponsibleId(),
+      created_at: this.getCreatedAt(),
+      updated_at: this.getUpdatedAt(),
+    };
+  }
 }

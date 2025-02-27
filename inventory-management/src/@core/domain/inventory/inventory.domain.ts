@@ -79,4 +79,15 @@ export class Inventory {
 
     this.updated_at = new Date();
   }
+
+  public toJSON() {
+    return {
+      id: this.id.value,
+      quantity: this.quantity.toNumber(),
+      minimum_stock: this.minimum_stock,
+      alert_on_low_stock: this.alert_on_low_stock,
+      created_at: this.created_at,
+      updated_at: this.updated_at,
+    };
+  }
 }

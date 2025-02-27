@@ -6,6 +6,8 @@ import {
 } from './input/product-props';
 import { Product } from './product.domain';
 import { ProductBatch } from '../product-batch/product-batch.domain';
+import { Inventory } from '../inventory/inventory.domain';
+import { Decimal } from '@prisma/client/runtime/library';
 
 export class DigitalProduct extends Product {
   private url: URL;
@@ -18,7 +20,7 @@ export class DigitalProduct extends Product {
   public static override create(
     command: CreateDigitalProductCommand,
   ): DigitalProduct {
-    return new DigitalProduct({
+    const digital_product = new DigitalProduct({
       id: new Uuid(),
       name: new Name(command.name),
       description: new Description(command.description),
@@ -31,6 +33,17 @@ export class DigitalProduct extends Product {
       user: command.user,
       batch: new Set<ProductBatch>(),
     });
+
+    if (!digital_product.inventory) {
+      digital_product.inventory = Inventory.create({
+        product: digital_product,
+        quantity: new Decimal(0),
+        alert_on_low_stock: false,
+        minimum_stock: null,
+      });
+    }
+
+    return digital_product;
   }
 
   // Getters

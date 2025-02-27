@@ -18,6 +18,7 @@ import {
   ReleaseProductReservationManagerCommand,
   ReserveProductReservationManagerCommand,
 } from '../product-reservation-manager/input/product-reservation-manager.props';
+import { ProductCategoryManager } from '../category/product-category-manager.domain';
 
 export class Product {
   private id: Uuid;
@@ -25,7 +26,7 @@ export class Product {
   private description: Description;
   private categories: Set<Category>;
   private batches: Set<ProductBatch>;
-  private inventory: Inventory | null;
+  protected inventory: Inventory | null;
   private reservation_type: ReservationType;
   private user: User;
   private created_at: Date;
@@ -120,22 +121,44 @@ export class Product {
     return this.batches;
   }
 
-  public addCategory(category: Category): void {
-    if (this.categories.has(category)) {
-      throw new Error('Category already added');
-    }
+  public addCategories(categories: Set<Category>): ProductCategoryManager {
+    const product_category_manager = new ProductCategoryManager({
+      product: this,
+      categories: categories,
+    });
 
-    this.categories.add(category);
+    product_category_manager.addCategories(categories);
+
+    this.categories = new Set([
+      ...Array.from(this.categories),
+      ...Array.from(product_category_manager.getCategoriesToAdd()),
+    ]);
+
     this.updated_at = new Date();
+
+    return product_category_manager;
   }
 
-  public removeCategory(category: Category): void {
-    if (!this.categories.has(category)) {
-      throw new Error('Category not found');
-    }
+  public removeCategories(categories: Set<Category>): ProductCategoryManager {
+    const product_category_manager = new ProductCategoryManager({
+      product: this,
+      categories: this.categories,
+    });
 
-    this.categories.delete(category);
+    product_category_manager.removeCategories(categories);
+
+    this.categories = new Set(
+      Array.from(this.categories).filter(
+        (category) =>
+          !Array.from(
+            product_category_manager.getCategoriesToRemove(),
+          ).includes(category),
+      ),
+    );
+
     this.updated_at = new Date();
+
+    return product_category_manager;
   }
 
   private updateDescription(description?: string): void {
@@ -223,5 +246,20 @@ export class Product {
       product_reservation: command.product_reservation,
       batch: command.batch,
     });
+  }
+
+  public toJSON() {
+    return {
+      id: this.getId(),
+      name: this.getName(),
+      description: this.getDescription(),
+      categories: Array.from(this.categories).map((c) => c.toJSON?.() ?? c), // Se Category tiver um método toJSON()
+      reservation_type: this.getReservationType(),
+      created_at: this.getCreatedAt(),
+      updated_at: this.getUpdatedAt(),
+      responsible_id: this.getResponsibleId(),
+      batches: Array.from(this.batches).map((b) => b.toJSON?.() ?? b),
+      inventory: this.inventory ? this.inventory.toJSON() : null, // Evita referência circular
+    };
   }
 }

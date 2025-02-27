@@ -10,10 +10,11 @@ import {
   UpdateProductService,
 } from './services';
 import { CategoryRepository } from '../category/repositories/category.repository';
+import { ProductController } from './controller/product.controller';
 
 @Module({
   imports: [],
-  controllers: [],
+  controllers: [ProductController],
   providers: [
     ProductRepository,
     AddProductCategoryService,

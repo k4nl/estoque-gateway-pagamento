@@ -6,6 +6,10 @@ import { ProductMapper } from 'src/@core/infra/mappers/product.mapper';
 import { DatabaseService } from 'src/config/database/database.service';
 import { ReservationType } from '@prisma/client';
 import { GetAllProductsFilter } from './repository.types';
+import { Uuid } from 'src/@core/value-object';
+import { Category } from 'src/@core/domain/category/category.domain';
+import { ProductCategoryManager } from 'src/@core/domain/category/product-category-manager.domain';
+import { ProductCategoryMapper } from 'src/@core/infra/mappers/product-category.mapper';
 
 @Injectable()
 export class ProductRepository {
@@ -79,13 +83,25 @@ export class ProductRepository {
         description: productModel.description,
         reservation_type: productModel.reservation_type,
         categories: {
-          connect: productModel.categories,
+          createMany: {
+            data: productModel.categories.map((category) => ({
+              id: new Uuid().value,
+              category_id: category.id,
+            })),
+          },
         },
         user_id: productModel.user_id,
         created_at: productModel.created_at,
         updated_at: productModel.updated_at,
         inventory: {
-          create: productModel.inventory,
+          create: {
+            quantity: productModel.inventory.quantity,
+            alert_on_low_stock: productModel.inventory.alert_on_low_stock,
+            created_at: productModel.inventory.created_at,
+            id: productModel.inventory.id,
+            updated_at: productModel.inventory.updated_at,
+            minimum_stock: productModel.inventory.minimum_stock,
+          },
         },
         product_batches: productModel.product_batches
           ? {
@@ -96,14 +112,36 @@ export class ProductRepository {
           : undefined,
         digital_product: productModel.digital_product
           ? {
-              create: productModel.digital_product,
+              create: {
+                url: productModel.digital_product.url,
+              },
             }
           : undefined,
         physical_product: productModel.physical_product
           ? {
-              create: productModel.physical_product,
+              create: {
+                expiration_date: productModel.physical_product.expiration_date,
+                perishable: productModel.physical_product.perishable,
+              },
             }
           : undefined,
+      },
+    });
+  }
+
+  async updateCategories(
+    product: Product,
+    manager: ProductCategoryManager,
+  ): Promise<void> {
+    const product_category_mapper = ProductCategoryMapper.toDatabase(
+      manager,
+      product.getId(),
+    );
+
+    await this.database.product.update({
+      where: { id: product.getId() },
+      data: {
+        categories: product_category_mapper,
       },
     });
   }
@@ -116,9 +154,6 @@ export class ProductRepository {
       data: {
         description: productModel.description,
         reservation_type: productModel.reservation_type,
-        categories: {
-          set: productModel.categories,
-        },
         updated_at: productModel.updated_at,
         digital_product: productModel.digital_product
           ? {
@@ -148,13 +183,13 @@ export class ProductRepository {
 
   async getAll(
     filter: GetAllProductsFilter,
-  ): Promise<{ products: Set<Product> } & { total: number }> {
+  ): Promise<{ products: Product[] } & { total: number }> {
     const reservation_type = filter.reservation_type
       ? ReservationType[filter.reservation_type] ||
         new Error('Invalid reservation type')
       : undefined;
 
-    if (reservation_type.constructor === Error) {
+    if (reservation_type?.constructor === Error) {
       throw reservation_type;
     }
 
@@ -195,6 +230,9 @@ export class ProductRepository {
         },
         skip: filter.offset,
         take: filter.limit,
+        orderBy: {
+          created_at: 'desc',
+        },
       }),
       this.database.product.count({
         where,
@@ -202,7 +240,7 @@ export class ProductRepository {
     ]);
 
     return {
-      products: new Set(products.map(ProductMapper.toDomain)),
+      products: products.map(ProductMapper.toDomain),
       total,
     };
   }

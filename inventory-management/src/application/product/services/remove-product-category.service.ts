@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ProductRepository } from '../repositories/product.repository';
 import { User } from 'src/@core/domain/user/user.domain';
 import { ProductCategoryDTO } from '../dto/add-product-category.dto';
@@ -25,24 +25,18 @@ export class RemoveProductCategoryService {
       ),
     ]);
 
-    for (const category of categories) {
-      const category_responsible = category.getResponsibleId();
-
-      if (category_responsible && category_responsible !== user.getId()) {
-        throw new Error(
-          `You are not allowed to add category ${category.getName()}`,
-        );
-      }
-
-      product.removeCategory(category);
+    if (productCategoryDTO.category_ids.length !== categories.size) {
+      throw new BadRequestException('Some categories do not exist');
     }
 
-    await this.productRepository.update(product);
+    const manager = product.removeCategories(categories);
+
+    await this.productRepository.updateCategories(product, manager);
 
     return {
-      message: `Categories ${productCategoryDTO.category_ids.join(
-        ', ',
-      )} removed from product ${product.getName()}`,
+      message: `Categories ${Array.from(categories)
+        .map((category) => category.getName())
+        .join(', ')} removed to product ${product.getName()}`,
     };
   }
 }

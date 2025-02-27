@@ -22,3 +22,23 @@ export class DatabaseErrorFilter extends BaseExceptionFilter {
     });
   }
 }
+
+@Catch(Prisma.PrismaClientValidationError)
+export class DatabaseValidationErrorFilter extends BaseExceptionFilter {
+  logger = new Logger(this.constructor.name);
+
+  catch(
+    exception: Prisma.PrismaClientValidationError,
+    host: ArgumentsHost,
+  ): void {
+    this.logger.error(exception.message, exception.stack);
+
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse<Response>();
+
+    response.status(HttpStatus.BAD_REQUEST).json({
+      statusCode: HttpStatus.BAD_REQUEST,
+      message: 'Bad request',
+    });
+  }
+}

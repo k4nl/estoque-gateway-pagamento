@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ProductRepository } from '../repositories/product.repository';
 import { GetProductService } from './get-product.service';
 import { ProductCategoryDTO } from '../dto/add-product-category.dto';
@@ -26,19 +26,13 @@ export class AddProductCategoryService {
       ),
     ]);
 
-    for (const category of categories) {
-      const category_responsible = category.getResponsibleId();
-
-      if (category_responsible && category_responsible !== user.getId()) {
-        throw new Error(
-          `You are not allowed to add category ${category.getName()}`,
-        );
-      }
-
-      product.addCategory(category);
+    if (productCategoryDTO.category_ids.length !== categories.size) {
+      throw new BadRequestException('Some categories do not exist');
     }
 
-    await this.productRepository.update(product);
+    const manager = product.addCategories(categories);
+
+    await this.productRepository.updateCategories(product, manager);
 
     return {
       message: `Categories ${Array.from(categories)

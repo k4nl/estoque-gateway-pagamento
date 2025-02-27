@@ -17,9 +17,11 @@ export class ErrorFilter extends BaseExceptionFilter {
 
       response.status(status).json(exception.getResponse());
     } else {
+      const error = exception as Error;
+
       response.status(500).json({
         statusCode: 500,
-        message: 'Internal server error',
+        message: error.message,
       });
     }
   }

@@ -3,7 +3,10 @@ import { AppModule } from './app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { useContainer } from 'class-validator';
 import CustomValidationPipe from './@core/application/errors/custom-validation-pipe';
-import { DatabaseErrorFilter } from './@core/application/errors/database-error-filter';
+import {
+  DatabaseErrorFilter,
+  DatabaseValidationErrorFilter,
+} from './@core/application/errors/database-error-filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -19,6 +22,7 @@ async function bootstrap() {
   app.useGlobalPipes(CustomValidationPipe);
 
   app.useGlobalFilters(new DatabaseErrorFilter());
+  app.useGlobalFilters(new DatabaseValidationErrorFilter());
 
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 

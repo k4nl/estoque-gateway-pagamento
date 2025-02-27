@@ -4,6 +4,8 @@ import {
   PhysicalProductProps,
 } from './input/product-props';
 import { Description, Name, Uuid } from 'src/@core/value-object';
+import { Inventory } from '../inventory/inventory.domain';
+import { Decimal } from '@prisma/client/runtime/library';
 
 export class PhysicalProduct extends Product {
   private expiration_date?: Date;
@@ -18,7 +20,7 @@ export class PhysicalProduct extends Product {
   public static override create(
     command: CreatePhysicalProductCommand,
   ): PhysicalProduct {
-    return new PhysicalProduct({
+    const physical_product = new PhysicalProduct({
       id: new Uuid(),
       name: new Name(command.name),
       description: new Description(command.description),
@@ -32,6 +34,17 @@ export class PhysicalProduct extends Product {
       batch: command.batch,
       user: command.user,
     });
+
+    if (!physical_product.inventory) {
+      physical_product.inventory = Inventory.create({
+        product: physical_product,
+        quantity: new Decimal(0),
+        alert_on_low_stock: false,
+        minimum_stock: null,
+      });
+    }
+
+    return physical_product;
   }
 
   // Getters

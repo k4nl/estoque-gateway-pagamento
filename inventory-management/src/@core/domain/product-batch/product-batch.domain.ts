@@ -75,4 +75,14 @@ export class ProductBatch {
 
     return now > this.expiration_date;
   }
+
+  public toJSON() {
+    return {
+      id: this.id.value,
+      quantity: this.quantity.toNumber(),
+      expiration_date: this.expiration_date,
+      created_at: this.created_at,
+      updated_at: this.updated_at,
+    };
+  }
 }

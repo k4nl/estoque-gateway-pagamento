@@ -22,15 +22,15 @@ export class ProductMapper {
     product: DigitalProductDomain | PhysicalProductDomain | ProductDomain,
   ): Omit<ToProductModelExtended, 'user'> {
     if (product instanceof DigitalProductDomain) {
-      return this.toDatabaseDigitalProduct(product);
+      return ProductMapper.toDatabaseDigitalProduct(product);
     }
 
     if (product instanceof PhysicalProductDomain) {
-      return this.toDatabasePhysicalProduct(product);
+      return ProductMapper.toDatabasePhysicalProduct(product);
     }
 
     if (product instanceof ProductDomain) {
-      return this.toDatabaseProduct(product);
+      return ProductMapper.toDatabaseProduct(product);
     }
 
     throw new Error('Invalid product type');
@@ -40,14 +40,14 @@ export class ProductMapper {
     product: ProductModelExtended,
   ): ProductDomain | PhysicalProductDomain | DigitalProductDomain {
     if (product.physical_product) {
-      return this.toPhysicalProduct(product);
+      return ProductMapper.toPhysicalProduct(product);
     }
 
     if (product.digital_product) {
-      return this.toDigitalProduct(product);
+      return ProductMapper.toDigitalProduct(product);
     }
 
-    return this.toProduct(product);
+    return ProductMapper.toProduct(product);
   }
 
   private static toPhysicalProduct(

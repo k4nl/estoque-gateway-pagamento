@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ProductRepository } from '../repositories/product.repository';
 import { GetProductService } from './get-product.service';
 import { User } from 'src/@core/domain/user/user.domain';
+import { UpdateProductDTO } from '../dto/update-product.dto';
 
 @Injectable()
 export class UpdateProductService {
@@ -10,7 +11,11 @@ export class UpdateProductService {
     private readonly productRepository: ProductRepository,
   ) {}
 
-  async execute(updateProductDTO: any, product_id: string, user: User) {
+  async execute(
+    updateProductDTO: UpdateProductDTO,
+    product_id: string,
+    user: User,
+  ) {
     const product = await this.getProductService.execute(product_id, user);
 
     product.update(updateProductDTO);

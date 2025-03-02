@@ -161,6 +161,14 @@ export class Product {
     return product_category_manager;
   }
 
+  public addProductBatch(batch: ProductBatch): void {
+    if (this.batches.has(batch)) {
+      throw new Error('Batch already exists');
+    }
+
+    this.batches.add(batch);
+  }
+
   private updateDescription(description?: string): void {
     if (!description) {
       return;

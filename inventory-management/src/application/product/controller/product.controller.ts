@@ -25,6 +25,7 @@ import { CreateProductDTO } from '../dto/create-product.dto';
 import { ProductCategoryDTO } from '../dto/add-product-category.dto';
 import { ProductFilterDTO } from '../dto/product-filter.dto';
 import { ProductIdDTO } from '../dto/product-id.dto';
+import { UpdateProductDTO } from '../dto/update-product.dto';
 
 @Controller('product')
 export class ProductController {
@@ -70,6 +71,20 @@ export class ProductController {
   ) {
     return this.removeProductCategoryService.execute(
       removeProductCategoryDTO,
+      product_id.id,
+      user,
+    );
+  }
+
+  @Roles(UserType.CLIENT)
+  @Patch('/:id')
+  async updateProduct(
+    @Body() updateProductDTO: UpdateProductDTO,
+    @Param() product_id: ProductIdDTO,
+    @GetUser() user: User,
+  ) {
+    return this.updateProductService.execute(
+      updateProductDTO,
       product_id.id,
       user,
     );

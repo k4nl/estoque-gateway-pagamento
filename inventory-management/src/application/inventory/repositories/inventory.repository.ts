@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/config/database/database.service';
 import {
+  CreateInventoryLog,
   GetAllInventoryFilter,
   GetAllProductsFilterResponse,
 } from './repository.types';
@@ -122,6 +123,16 @@ export class InventoryRepository {
         minimum_stock: inventory.getMinimumStock().toNumber(),
         alert_on_low_stock: inventory.getAlertOnLowStock(),
         updated_at: inventory.getUpdatedAt(),
+      },
+    });
+  }
+
+  async createLog(createInventoryLog: CreateInventoryLog) {
+    await this.database.inventoryLog.create({
+      data: {
+        inventory_id: createInventoryLog.inventory_id,
+        quantity: createInventoryLog.quantity,
+        reason: createInventoryLog.reason,
       },
     });
   }

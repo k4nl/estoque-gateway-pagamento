@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { LowStockTriggerPayload } from 'src/config/database/triggers/trigger.types';
 import { PublisherManager } from 'src/config/events/transporter';
-import { InventoryEventsEnum } from '../events/inventory.events';
+import { InventoryEventsEnum } from '../events/inventory.enum';
 
 @Injectable()
 export class AlertOnLowStockService {

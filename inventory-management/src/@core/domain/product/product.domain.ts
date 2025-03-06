@@ -19,6 +19,7 @@ import {
   ReserveProductReservationManagerCommand,
 } from '../product-reservation-manager/input/product-reservation-manager.props';
 import { ProductCategoryManager } from '../category/product-category-manager.domain';
+import { BadRequestException } from '@nestjs/common';
 
 export class Product {
   private id: Uuid;
@@ -163,7 +164,7 @@ export class Product {
 
   public addProductBatch(batch: ProductBatch): void {
     if (this.batches.has(batch)) {
-      throw new Error('Batch already exists');
+      throw new BadRequestException('Batch already exists');
     }
 
     this.batches.add(batch);

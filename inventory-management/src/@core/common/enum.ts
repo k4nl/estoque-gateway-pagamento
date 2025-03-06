@@ -14,3 +14,8 @@ export enum ReservationStatus {
   CANCELED = 'canceled',
   EXPIRED = 'expired',
 }
+
+export enum UpdateQuantityBatchEnum {
+  INCREMENT = 'increment',
+  DECREMENT = 'decrement',
+}

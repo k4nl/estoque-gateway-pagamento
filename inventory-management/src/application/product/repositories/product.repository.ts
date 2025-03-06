@@ -7,7 +7,6 @@ import { DatabaseService } from 'src/config/database/database.service';
 import { ReservationType } from '@prisma/client';
 import { GetAllProductsFilter } from './repository.types';
 import { Uuid } from 'src/@core/value-object';
-import { Category } from 'src/@core/domain/category/category.domain';
 import { ProductCategoryManager } from 'src/@core/domain/category/product-category-manager.domain';
 import { ProductCategoryMapper } from 'src/@core/infra/mappers/product-category.mapper';
 

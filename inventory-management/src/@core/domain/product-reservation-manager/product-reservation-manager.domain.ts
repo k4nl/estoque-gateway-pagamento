@@ -1,5 +1,8 @@
 import { ProductReservation } from '../product-reservation/product-reservation.domain';
-import { ReservationStatus } from 'src/@core/common/enum';
+import {
+  ReservationStatus,
+  UpdateQuantityBatchEnum,
+} from 'src/@core/common/enum';
 import {
   CancelReservationProductManagerCommand,
   ExpireReservationProductManagerCommand,
@@ -41,7 +44,10 @@ export class ProductReservationManager {
       expires_at: command.minutes_to_expire,
     });
 
-    batch.decrementQuantity(quantity);
+    batch.updateQuantity({
+      type: UpdateQuantityBatchEnum.DECREMENT,
+      quantity: quantity.toNumber(),
+    });
 
     return reservation;
   }

@@ -1,3 +1,4 @@
+import { Decimal } from '@prisma/client/runtime/library';
 import { ReservationType } from 'src/@core/common/enum';
 import { Inventory } from 'src/@core/domain/inventory/inventory.domain';
 
@@ -17,4 +18,10 @@ export type GetAllInventoryFilter = {
 export type GetAllProductsFilterResponse = {
   total: number;
   inventories: Inventory[];
+};
+
+export type CreateInventoryLog = {
+  inventory_id: string;
+  quantity: Decimal;
+  reason: string;
 };

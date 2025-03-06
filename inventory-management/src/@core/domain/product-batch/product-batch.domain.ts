@@ -2,13 +2,17 @@ import { Uuid } from 'src/@core/value-object';
 import {
   CreateProductBatchCommand,
   ProductBatchProps,
+  UpdateProductBatchCommand,
 } from './input/product-batch-props';
 import { Decimal } from '@prisma/client/runtime/library';
+import { ProductBatchUpdateCommand } from '../product-batch-manager/input/product-batch-manager.props';
+import { ProductBatchManager } from '../product-batch-manager/product-batch-manager.domain';
 
 export class ProductBatch {
   private id: Uuid;
   private quantity: Decimal;
   private expiration_date?: Date;
+  private product_id: Uuid;
   private created_at: Date;
   private updated_at: Date;
 
@@ -18,6 +22,7 @@ export class ProductBatch {
     this.expiration_date = props.expiration_date;
     this.created_at = props.created_at;
     this.updated_at = props.updated_at;
+    this.product_id = props.product_id;
   }
 
   public static create(command: CreateProductBatchCommand): ProductBatch {
@@ -25,6 +30,10 @@ export class ProductBatch {
       id: new Uuid(),
       quantity: command.quantity,
       expiration_date: command.expiration_date,
+      product_id:
+        typeof command.product_id === 'string'
+          ? new Uuid(command.product_id)
+          : command.product_id,
       created_at: new Date(),
       updated_at: new Date(),
     });
@@ -52,13 +61,19 @@ export class ProductBatch {
     return this.updated_at;
   }
 
+  public updateQuantity(
+    command: ProductBatchUpdateCommand,
+  ): ProductBatchManager {
+    const productBatchManager = new ProductBatchManager(this);
+
+    productBatchManager.updateQuantity(command);
+
+    this.updated_at = new Date();
+
+    return productBatchManager;
+  }
+
   public decrementQuantity(quantity: Decimal) {
-    const isNegative = this.quantity.minus(quantity).lessThan(0);
-
-    if (isNegative) {
-      throw new Error('Not enough quantity to reserve');
-    }
-
     this.quantity = this.quantity.minus(quantity);
   }
 
@@ -74,6 +89,15 @@ export class ProductBatch {
     const now = new Date();
 
     return now > this.expiration_date;
+  }
+
+  public getProductId(): string {
+    return this.product_id.toString();
+  }
+
+  public update(command: UpdateProductBatchCommand) {
+    this.expiration_date = command.expiration_date;
+    this.updated_at = new Date();
   }
 
   public toJSON() {
